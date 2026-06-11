@@ -99,26 +99,7 @@
     </div>
   </main>
 
-  <!-- PROMO SIDEBAR -->
-  <aside class="promo-sidebar">
-    <div class="promo-title">Featured Specialists</div>
-    <div class="promo-img-wrap">
-      <img src="image/pexels-tima-miroshnichenko-6235010.jpg" alt="Featured Doctor">
-      <div class="promo-overlay">Top Rated Cardiology</div>
-    </div>
-    <div class="promo-img-wrap">
-      <img src="image/pexels-rdne-6129676.jpg" alt="Featured Clinic">
-      <div class="promo-overlay">Modern Facilities</div>
-    </div>
-    <div class="promo-img-wrap">
-      <img src="image/pexels-pavel-danilyuk-7108238.jpg" alt="Pediatrics">
-      <div class="promo-overlay">Expert Pediatrics</div>
-    </div>
-    <div class="promo-img-wrap">
-      <img src="image/pexels-mikhail-nilov-8942498.jpg" alt="Dental Care">
-      <div class="promo-overlay">Advanced Dental Care</div>
-    </div>
-  </aside>
+  <!-- PROMO SIDEBAR REMOVED -->
 
 </div>
 
@@ -146,29 +127,27 @@
           }
 
           const html = `
-          <div class="doctor-row modern-doctor-card" onclick="location.href='doctor-profile.html?id=${doc._id}'">
-            <div class="avatar-container">
+          <div class="doctor-card modern-grid-card" onclick="location.href='doctor-profile.html?id=${doc._id}'">
+            <div class="card-top-badges">
+              <div class="modern-badge badge-verified"><i class="fas fa-check-circle"></i></div>
+              <div class="modern-badge badge-available">Available</div>
+            </div>
+            <div class="card-avatar-wrap">
               ${avatarHtml}
-              <div class="verified-ring"></div>
             </div>
-            <div class="doc-info-col">
-              <div class="doc-name-wrap">
-                <div class="doc-name">Dr. ${doc.first_name} ${doc.last_name}</div>
-                <div class="modern-badge badge-verified"><i class="fas fa-check-circle"></i> Verified</div>
-              </div>
-              <div class="doc-specialty">${doc.specialty || 'General Physician'} <span class="dot-sep">•</span> ${doc.experience_years || 0} yrs exp</div>
-              
-              <div class="doc-stats">
-                <span><i class="fas fa-star" style="color:var(--amber)"></i> 5.0</span>
-                <span><i class="fas fa-map-marker-alt" style="color:var(--gray-400)"></i> ${doc.location || 'Online'}</span>
+            <div class="card-body">
+              <div class="doc-name">Dr. ${doc.first_name} ${doc.last_name}</div>
+              <div class="doc-specialty">${doc.specialty || 'General Physician'}</div>
+              <div class="doc-exp">${doc.experience_years || 0} yrs exp</div>
+              <div class="doc-stats-grid">
+                <div class="stat-item"><i class="fas fa-star" style="color:var(--amber)"></i> 5.0</div>
+                <div class="stat-item"><i class="fas fa-map-marker-alt" style="color:var(--gray-400)"></i> ${doc.location || 'Online'}</div>
               </div>
             </div>
-            
-            <div class="doc-action-col">
-              <div class="modern-badge badge-available">Available Today</div>
-              <div class="price-wrap">
+            <div class="card-footer">
+              <div class="card-price">
                 <div class="doc-fee">$${doc.fee_per_visit || 0}</div>
-                <div class="doc-fee-label">per consultation</div>
+                <div class="doc-fee-label">Consultation</div>
               </div>
               <button class="btn-modern-book" onclick="event.stopPropagation(); location.href='booking.html?id=${doc._id}'">Book Slot</button>
             </div>

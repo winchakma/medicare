@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Book Appointment — MediCare</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy: #0A1628; --teal: #0D9B76; --teal-light: #E1F5EE; --white: #ffffff;
+    --gray-50: #F8F9FB; --gray-100: #EFF1F5; --gray-200: #D8DCE6;
+    --gray-500: #6B7280; --gray-700: #374151; --gray-900: #111827;
+    --amber: #EF9F27; --red: #EF4444;
+  }
+  body { font-family: 'Inter', sans-serif; color: var(--gray-900); background: var(--gray-50); }
+  a { text-decoration: none; color: inherit; }
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 0 5%; height: 64px; border-bottom: 1px solid var(--gray-200); background: white; }
+  .logo { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--navy); }
+  .logo span { color: var(--teal); }
+
+  .progress-bar { background: white; border-bottom: 1px solid var(--gray-200); padding: 16px 5%; }
+  .steps { display: flex; align-items: center; gap: 0; max-width: 600px; margin: 0 auto; }
+  .step-item { display: flex; align-items: center; gap: 8px; flex: 1; }
+  .step-circle { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+  .step-circle.done { background: var(--teal); color: white; }
+  .step-circle.active { background: var(--navy); color: white; }
+  .step-circle.pending { background: var(--gray-100); color: var(--gray-500); }
+  .step-text { font-size: 12px; font-weight: 500; }
+  .step-text.active { color: var(--navy); }
+  .step-text.done { color: var(--teal); }
+  .step-text.pending { color: var(--gray-500); }
+  .step-line { flex: 1; height: 2px; background: var(--gray-200); margin: 0 8px; }
+  .step-line.done { background: var(--teal); }
+
+  .page-wrap { max-width: 1000px; margin: 0 auto; padding: 28px 5%; display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items: start; }
+
+  .form-card { background: white; border: 1px solid var(--gray-200); border-radius: 16px; padding: 28px; }
+  .form-title { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--navy); margin-bottom: 4px; }
+  .form-subtitle { font-size: 13px; color: var(--gray-500); margin-bottom: 24px; }
+
+  .form-section { margin-bottom: 28px; }
+  .form-section-title { font-size: 13px; font-weight: 600; color: var(--gray-900); text-transform: uppercase; letter-spacing: 0.05em; padding-bottom: 10px; border-bottom: 1px solid var(--gray-100); margin-bottom: 16px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .field-single { margin-bottom: 14px; }
+  .field-group { display: flex; flex-direction: column; gap: 5px; }
+  .field-group label { font-size: 12px; font-weight: 500; color: var(--gray-700); }
+  .field-group input, .field-group select, .field-group textarea {
+    padding: 10px 14px; border: 1px solid var(--gray-200); border-radius: 8px;
+    font-size: 14px; color: var(--gray-900); font-family: 'Inter', sans-serif;
+    outline: none; transition: border-color .2s; background: white;
+  }
+  .field-group input:focus, .field-group select:focus, .field-group textarea:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,155,118,0.08); }
+  .field-group textarea { resize: vertical; min-height: 90px; }
+  .required { color: var(--red); margin-left: 2px; }
+
+  /* SLOT PICKER */
+  .date-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 16px; }
+  .date-tab { flex-shrink: 0; padding: 10px 16px; border: 1px solid var(--gray-200); border-radius: 10px; font-size: 13px; cursor: pointer; background: white; text-align: center; }
+  .date-tab.active { background: var(--navy); color: white; border-color: var(--navy); }
+  .date-tab .dname { font-size: 10px; opacity: 0.7; display: block; }
+  .slots-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
+  .slot { padding: 9px; border: 1px solid var(--gray-200); border-radius: 8px; font-size: 12px; text-align: center; cursor: pointer; color: var(--gray-700); transition: all .15s; }
+  .slot:hover { border-color: var(--teal); color: var(--teal); }
+  .slot.selected { background: var(--teal); color: white; border-color: var(--teal); font-weight: 500; }
+  .slot.booked { background: var(--gray-100); color: var(--gray-300); cursor: not-allowed; }
+
+  /* PAYMENT */
+  .payment-methods { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+  .pay-method { border: 1.5px solid var(--gray-200); border-radius: 10px; padding: 12px; text-align: center; cursor: pointer; transition: all .15s; }
+  .pay-method.active { border-color: var(--teal); background: var(--teal-light); }
+  .pay-method-icon { font-size: 22px; margin-bottom: 4px; }
+  .pay-method-name { font-size: 12px; font-weight: 500; color: var(--gray-700); }
+  .card-fields { background: var(--gray-50); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+
+  .submit-btn { width: 100%; padding: 14px; background: var(--teal); color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background .2s; }
+  .submit-btn:hover { background: #0b8a67; }
+  .secure-note { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; color: var(--gray-500); margin-top: 10px; }
+
+  /* SUMMARY SIDEBAR */
+  .summary-card { background: white; border: 1px solid var(--gray-200); border-radius: 16px; padding: 20px; position: sticky; top: 24px; }
+  .summary-title { font-size: 14px; font-weight: 600; color: var(--gray-900); margin-bottom: 16px; }
+  .doc-mini { display: flex; gap: 12px; align-items: center; padding: 12px; background: var(--gray-50); border-radius: 10px; margin-bottom: 16px; }
+  .doc-mini-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600; color: white; flex-shrink: 0; }
+  .doc-mini-name { font-size: 14px; font-weight: 500; }
+  .doc-mini-spec { font-size: 12px; color: var(--teal); }
+  .booking-detail { display: flex; justify-content: space-between; font-size: 13px; padding: 8px 0; border-bottom: 1px solid var(--gray-100); }
+  .booking-detail:last-of-type { border-bottom: none; }
+  .booking-detail-label { color: var(--gray-500); }
+  .booking-detail-value { font-weight: 500; color: var(--gray-900); }
+  .price-breakdown { margin-top: 16px; padding-top: 14px; border-top: 2px solid var(--gray-100); }
+  .price-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; }
+  .price-row.total { font-size: 15px; font-weight: 600; color: var(--navy); padding-top: 8px; border-top: 1px solid var(--gray-200); margin-top: 6px; }
+  .promo-input { display: flex; gap: 8px; margin-top: 12px; }
+  .promo-input input { flex: 1; padding: 8px 12px; border: 1px solid var(--gray-200); border-radius: 8px; font-size: 13px; outline: none; }
+  .promo-apply { padding: 8px 14px; background: var(--navy); color: white; border: none; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; white-space: nowrap; }
+
+  @media(max-width:768px) { .page-wrap { grid-template-columns: 1fr; } .summary-card { position: static; } .field-row { grid-template-columns: 1fr; } .slots-grid { grid-template-columns: repeat(3,1fr); } .payment-methods { grid-template-columns: repeat(3,1fr); } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo"><a href="index.html">Medi<span>Care</span></a></div>
+  <div style="font-size:14px;color:var(--gray-500)">Need help? <a href="#" style="color:var(--teal)">Contact Support</a></div>
+</nav>
+
+<!-- PROGRESS -->
+<div class="progress-bar">
+  <div class="steps">
+    <div class="step-item">
+      <div class="step-circle done">✓</div>
+      <div class="step-text done">Choose Doctor</div>
+    </div>
+    <div class="step-line done"></div>
+    <div class="step-item">
+      <div class="step-circle active">2</div>
+      <div class="step-text active">Patient Details</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step-item">
+      <div class="step-circle pending">3</div>
+      <div class="step-text pending">Payment</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step-item">
+      <div class="step-circle pending">4</div>
+      <div class="step-text pending">Confirmed</div>
+    </div>
+  </div>
+</div>
+
+<div class="page-wrap">
+  <div>
+    <div class="form-card">
+      <div class="form-title">Complete Your Booking</div>
+      <div class="form-subtitle">Fill in your details to confirm the appointment with Dr. Sarah Ahmed</div>
+
+      <!-- SLOT SELECTION -->
+      <div class="form-section">
+        <div class="form-section-title">Appointment Date & Time</div>
+        <div class="date-tabs">
+          <div class="date-tab active"><span class="dname">MON</span>Jun 11</div>
+          <div class="date-tab"><span class="dname">TUE</span>Jun 12</div>
+          <div class="date-tab"><span class="dname">WED</span>Jun 13</div>
+          <div class="date-tab"><span class="dname">THU</span>Jun 14</div>
+          <div class="date-tab"><span class="dname">FRI</span>Jun 15</div>
+        </div>
+        <div class="slots-grid">
+          <div class="slot booked">9:00 AM</div>
+          <div class="slot booked">9:30 AM</div>
+          <div class="slot selected">10:00 AM</div>
+          <div class="slot">10:30 AM</div>
+          <div class="slot">11:00 AM</div>
+          <div class="slot booked">11:30 AM</div>
+          <div class="slot">2:00 PM</div>
+          <div class="slot">2:30 PM</div>
+          <div class="slot">3:00 PM</div>
+          <div class="slot">3:30 PM</div>
+          <div class="slot booked">4:00 PM</div>
+          <div class="slot">4:30 PM</div>
+        </div>
+      </div>
+
+      <!-- PATIENT DETAILS -->
+      <div class="form-section">
+        <div class="form-section-title">Patient Information</div>
+        <div class="field-row">
+          <div class="field-group"><label>First Name <span class="required">*</span></label><input type="text" placeholder="Enter first name"></div>
+          <div class="field-group"><label>Last Name <span class="required">*</span></label><input type="text" placeholder="Enter last name"></div>
+        </div>
+        <div class="field-row">
+          <div class="field-group"><label>Date of Birth <span class="required">*</span></label><input type="date"></div>
+          <div class="field-group"><label>Gender <span class="required">*</span></label>
+            <select><option>Select gender</option><option>Male</option><option>Female</option><option>Other</option></select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-group"><label>Phone Number <span class="required">*</span></label><input type="tel" placeholder="01XXXXXXXXX"></div>
+          <div class="field-group"><label>Email Address</label><input type="email" placeholder="example@email.com"></div>
+        </div>
+        <div class="field-single">
+          <div class="field-group"><label>Reason for Visit <span class="required">*</span></label><textarea placeholder="Briefly describe your symptoms or reason for the appointment..."></textarea></div>
+        </div>
+      </div>
+
+      <!-- PAYMENT -->
+      <div class="form-section">
+        <div class="form-section-title">Payment Method</div>
+        <div class="payment-methods">
+          <div class="pay-method active">
+            <div class="pay-method-icon">💳</div>
+            <div class="pay-method-name">Card</div>
+          </div>
+          <div class="pay-method">
+            <div class="pay-method-icon">📱</div>
+            <div class="pay-method-name">bKash</div>
+          </div>
+          <div class="pay-method">
+            <div class="pay-method-icon">🏦</div>
+            <div class="pay-method-name">Nagad</div>
+          </div>
+        </div>
+        <div class="card-fields">
+          <div class="field-single"><div class="field-group"><label>Card Number</label><input type="text" placeholder="1234 5678 9012 3456"></div></div>
+          <div class="field-row">
+            <div class="field-group"><label>Expiry Date</label><input type="text" placeholder="MM / YY"></div>
+            <div class="field-group"><label>CVV</label><input type="text" placeholder="123"></div>
+          </div>
+          <div class="field-single"><div class="field-group"><label>Name on Card</label><input type="text" placeholder="Full name as on card"></div></div>
+        </div>
+      </div>
+
+      <button class="submit-btn">Confirm & Pay ৳800 →</button>
+      <div class="secure-note">🔒 Secured by Stripe · 256-bit SSL encryption</div>
+    </div>
+  </div>
+
+  <!-- SUMMARY -->
+  <div class="summary-card">
+    <div class="summary-title">Booking Summary</div>
+    <div class="doc-mini">
+      <div class="doc-mini-avatar">SA</div>
+      <div>
+        <div class="doc-mini-name">Dr. Sarah Ahmed</div>
+        <div class="doc-mini-spec">Cardiologist</div>
+      </div>
+    </div>
+    <div class="booking-detail"><span class="booking-detail-label">Date</span><span class="booking-detail-value">Mon, Jun 11, 2026</span></div>
+    <div class="booking-detail"><span class="booking-detail-label">Time</span><span class="booking-detail-value">10:00 AM</span></div>
+    <div class="booking-detail"><span class="booking-detail-label">Type</span><span class="booking-detail-value">In-Person Visit</span></div>
+    <div class="booking-detail"><span class="booking-detail-label">Location</span><span class="booking-detail-value">Dhaka Medical College</span></div>
+    <div class="price-breakdown">
+      <div class="price-row"><span style="color:var(--gray-500)">Consultation fee</span><span>৳800</span></div>
+      <div class="price-row"><span style="color:var(--gray-500)">Platform fee</span><span>৳50</span></div>
+      <div class="price-row"><span style="color:var(--gray-500)">Discount</span><span style="color:#16a34a">−৳0</span></div>
+      <div class="price-row total"><span>Total</span><span>৳850</span></div>
+    </div>
+    <div class="promo-input">
+      <input type="text" placeholder="Promo code">
+      <button class="promo-apply">Apply</button>
+    </div>
+    <div style="margin-top:16px;font-size:12px;color:var(--gray-500);line-height:1.5">
+      ✅ Free cancellation up to 24 hours before appointment<br>
+      ✅ Confirmation email will be sent instantly<br>
+      ✅ Secure payment via Stripe
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.slot:not(.booked)').forEach(s => {
+    s.addEventListener('click', () => {
+      document.querySelectorAll('.slot').forEach(x => x.classList.remove('selected'));
+      s.classList.add('selected');
+    });
+  });
+  document.querySelectorAll('.date-tab').forEach(d => {
+    d.addEventListener('click', () => {
+      document.querySelectorAll('.date-tab').forEach(x => x.classList.remove('active'));
+      d.classList.add('active');
+    });
+  });
+  document.querySelectorAll('.pay-method').forEach(p => {
+    p.addEventListener('click', () => {
+      document.querySelectorAll('.pay-method').forEach(x => x.classList.remove('active'));
+      p.classList.add('active');
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard — MediCare</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy: #0A1628; --teal: #0D9B76; --teal-light: #E1F5EE; --white: #ffffff;
+    --gray-50: #F8F9FB; --gray-100: #EFF1F5; --gray-200: #D8DCE6;
+    --gray-500: #6B7280; --gray-700: #374151; --gray-900: #111827;
+    --amber: #EF9F27; --red: #EF4444; --green: #22c55e;
+    --sidebar: #0A1628;
+  }
+  body { font-family: 'Inter', sans-serif; color: var(--gray-900); background: var(--gray-50); display: flex; min-height: 100vh; }
+  a { text-decoration: none; color: inherit; }
+
+  /* SIDEBAR */
+  .sidebar { width: 240px; background: var(--sidebar); min-height: 100vh; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; bottom: 0; }
+  .sidebar-logo { padding: 20px 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .sidebar-logo .logo { font-family: 'Playfair Display', serif; font-size: 20px; color: white; }
+  .sidebar-logo .logo span { color: #5DCAA5; }
+  .sidebar-logo .subtitle { font-size: 11px; color: rgba(255,255,255,0.35); margin-top: 2px; }
+  .sidebar-nav { flex: 1; padding: 12px 0; }
+  .nav-section-label { font-size: 10px; font-weight: 600; color: rgba(255,255,255,0.25); text-transform: uppercase; letter-spacing: 0.1em; padding: 12px 20px 6px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 20px; font-size: 13px; color: rgba(255,255,255,0.55); cursor: pointer; transition: all .15s; border-left: 3px solid transparent; }
+  .nav-item:hover { color: white; background: rgba(255,255,255,0.05); }
+  .nav-item.active { color: white; background: rgba(13,155,118,0.15); border-left-color: #5DCAA5; }
+  .nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
+  .nav-item .badge { margin-left: auto; background: var(--red); color: white; font-size: 10px; padding: 2px 7px; border-radius: 10px; }
+  .sidebar-user { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.07); display: flex; align-items: center; gap: 10px; }
+  .user-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: white; flex-shrink: 0; }
+  .user-name { font-size: 13px; color: white; font-weight: 500; }
+  .user-role { font-size: 11px; color: rgba(255,255,255,0.4); }
+
+  /* MAIN */
+  .main { margin-left: 240px; flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+  .topbar { background: white; border-bottom: 1px solid var(--gray-200); padding: 0 28px; height: 60px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 10; }
+  .topbar-title { font-size: 16px; font-weight: 600; color: var(--gray-900); }
+  .topbar-actions { display: flex; align-items: center; gap: 12px; }
+  .notif-btn { position: relative; width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--gray-200); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+  .notif-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: var(--red); border-radius: 50%; border: 2px solid white; }
+  .date-display { font-size: 13px; color: var(--gray-500); }
+  .add-btn { padding: 8px 16px; background: var(--teal); color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; }
+
+  .content { padding: 24px 28px; flex: 1; }
+
+  /* STAT CARDS */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .stat-card { background: white; border: 1px solid var(--gray-200); border-radius: 14px; padding: 18px 20px; }
+  .stat-card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 12px; }
+  .stat-card-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .stat-card-label { font-size: 12px; color: var(--gray-500); margin-bottom: 4px; }
+  .stat-card-value { font-size: 26px; font-weight: 700; color: var(--navy); }
+  .stat-card-change { font-size: 12px; margin-top: 4px; }
+  .change-up { color: #16a34a; }
+  .change-down { color: var(--red); }
+
+  /* CHARTS ROW */
+  .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .chart-card { background: white; border: 1px solid var(--gray-200); border-radius: 14px; padding: 20px; }
+  .chart-card-title { font-size: 14px; font-weight: 600; color: var(--gray-900); margin-bottom: 4px; }
+  .chart-card-sub { font-size: 12px; color: var(--gray-500); margin-bottom: 20px; }
+  .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 120px; }
+  .bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; height: 100%; justify-content: flex-end; }
+  .bar { width: 100%; border-radius: 4px 4px 0 0; min-height: 4px; transition: opacity .2s; }
+  .bar:hover { opacity: 0.8; }
+  .bar-label { font-size: 10px; color: var(--gray-500); }
+  .donut-wrap { display: flex; align-items: center; gap: 24px; }
+  .donut-legend { display: flex; flex-direction: column; gap: 8px; }
+  .legend-item { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+  .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+  /* TABLE */
+  .table-card { background: white; border: 1px solid var(--gray-200); border-radius: 14px; overflow: hidden; margin-bottom: 24px; }
+  .table-header { padding: 16px 20px; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; justify-content: space-between; }
+  .table-title { font-size: 14px; font-weight: 600; color: var(--gray-900); }
+  .table-actions { display: flex; gap: 8px; }
+  .search-input { padding: 7px 12px; border: 1px solid var(--gray-200); border-radius: 7px; font-size: 13px; outline: none; font-family: 'Inter', sans-serif; width: 200px; }
+  .filter-btn { padding: 7px 14px; border: 1px solid var(--gray-200); border-radius: 7px; font-size: 12px; background: white; cursor: pointer; color: var(--gray-700); }
+  table { width: 100%; border-collapse: collapse; }
+  thead { background: var(--gray-50); }
+  th { padding: 11px 16px; font-size: 11px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.05em; text-align: left; white-space: nowrap; }
+  td { padding: 13px 16px; font-size: 13px; color: var(--gray-700); border-top: 1px solid var(--gray-100); vertical-align: middle; }
+  tr:hover td { background: var(--gray-50); }
+  .status-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .status-confirmed { background: #dcfce7; color: #166534; }
+  .status-pending { background: #fef3c7; color: #92400e; }
+  .status-cancelled { background: #fee2e2; color: #991b1b; }
+  .action-btns { display: flex; gap: 6px; }
+  .act-btn { padding: 5px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; border: 1px solid var(--gray-200); background: white; color: var(--gray-700); }
+  .act-btn.approve { background: var(--teal-light); border-color: rgba(13,155,118,0.2); color: var(--teal); }
+  .act-btn.danger { background: #fee2e2; border-color: rgba(239,68,68,0.2); color: var(--red); }
+  .doc-cell { display: flex; align-items: center; gap: 8px; }
+  .mini-avatar { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: white; flex-shrink: 0; }
+  .pagination-row { padding: 14px 20px; border-top: 1px solid var(--gray-100); display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: var(--gray-500); }
+  .page-btns { display: flex; gap: 4px; }
+  .pb { width: 30px; height: 30px; border: 1px solid var(--gray-200); border-radius: 6px; background: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .pb.active { background: var(--navy); color: white; border-color: var(--navy); }
+
+  /* BOTTOM ROW */
+  .bottom-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .bottom-card { background: white; border: 1px solid var(--gray-200); border-radius: 14px; padding: 20px; }
+  .doctor-row-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid var(--gray-100); }
+  .doctor-row-item:last-child { border-bottom: none; }
+  .dr-info { flex: 1; }
+  .dr-name { font-size: 13px; font-weight: 500; }
+  .dr-spec { font-size: 11px; color: var(--gray-500); }
+  .dr-rating { font-size: 12px; color: var(--amber); }
+  .dr-bookings { font-size: 12px; color: var(--gray-500); text-align: right; }
+  .activity-item { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--gray-100); align-items: flex-start; }
+  .activity-item:last-child { border-bottom: none; }
+  .activity-dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 5px; flex-shrink: 0; }
+  .activity-text { font-size: 13px; color: var(--gray-700); line-height: 1.4; }
+  .activity-time { font-size: 11px; color: var(--gray-500); margin-top: 2px; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo">Medi<span>Care</span></div>
+    <div class="subtitle">Admin Dashboard</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <div class="nav-item active"><span class="icon">📊</span> Dashboard</div>
+    <div class="nav-item"><span class="icon">📅</span> Appointments <span class="badge">8</span></div>
+    <div class="nav-item"><span class="icon">👨‍⚕️</span> Doctors</div>
+    <div class="nav-item"><span class="icon">🧑‍🤝‍🧑</span> Patients</div>
+    <div class="nav-section-label">Finance</div>
+    <div class="nav-item"><span class="icon">💰</span> Revenue</div>
+    <div class="nav-item"><span class="icon">🧾</span> Invoices</div>
+    <div class="nav-section-label">System</div>
+    <div class="nav-item"><span class="icon">⚙️</span> Settings</div>
+    <div class="nav-item"><span class="icon">🔔</span> Notifications <span class="badge">3</span></div>
+    <div class="nav-item"><span class="icon">🤖</span> AI Reports</div>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-avatar">WC</div>
+    <div>
+      <div class="user-name">Win Chakma</div>
+      <div class="user-role">Super Admin</div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">Dashboard Overview</div>
+    <div class="topbar-actions">
+      <div class="date-display">Thu, Jun 11, 2026</div>
+      <div class="notif-btn">🔔<div class="notif-dot"></div></div>
+      <button class="add-btn">+ Add Doctor</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-card-top">
+          <div><div class="stat-card-label">Total Bookings</div><div class="stat-card-value">1,284</div></div>
+          <div class="stat-card-icon" style="background:#E1F5EE">📅</div>
+        </div>
+        <div class="stat-card-change change-up">↑ 12% vs last month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-top">
+          <div><div class="stat-card-label">Total Revenue</div><div class="stat-card-value">৳98,400</div></div>
+          <div class="stat-card-icon" style="background:#FFF3E0">💰</div>
+        </div>
+        <div class="stat-card-change change-up">↑ 18% vs last month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-top">
+          <div><div class="stat-card-label">Active Doctors</div><div class="stat-card-value">147</div></div>
+          <div class="stat-card-icon" style="background:#E3F2FD">👨‍⚕️</div>
+        </div>
+        <div class="stat-card-change change-up">↑ 5 new this month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-card-top">
+          <div><div class="stat-card-label">Total Patients</div><div class="stat-card-value">8,932</div></div>
+          <div class="stat-card-icon" style="background:#FCE4EC">🧑‍🤝‍🧑</div>
+        </div>
+        <div class="stat-card-change change-up">↑ 234 new this month</div>
+      </div>
+    </div>
+
+    <!-- CHARTS -->
+    <div class="charts-row">
+      <div class="chart-card">
+        <div class="chart-card-title">Monthly Bookings</div>
+        <div class="chart-card-sub">Last 6 months performance</div>
+        <div class="bar-chart">
+          <div class="bar-wrap"><div class="bar" style="height:60%;background:var(--teal);opacity:.5"></div><div class="bar-label">Jan</div></div>
+          <div class="bar-wrap"><div class="bar" style="height:75%;background:var(--teal);opacity:.6"></div><div class="bar-label">Feb</div></div>
+          <div class="bar-wrap"><div class="bar" style="height:65%;background:var(--teal);opacity:.7"></div><div class="bar-label">Mar</div></div>
+          <div class="bar-wrap"><div class="bar" style="height:85%;background:var(--teal);opacity:.8"></div><div class="bar-label">Apr</div></div>
+          <div class="bar-wrap"><div class="bar" style="height:70%;background:var(--teal);opacity:.9"></div><div class="bar-label">May</div></div>
+          <div class="bar-wrap"><div class="bar" style="height:100%;background:var(--teal)"></div><div class="bar-label">Jun</div></div>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">Bookings by Specialty</div>
+        <div class="chart-card-sub">Current month distribution</div>
+        <div class="donut-wrap">
+          <svg width="110" height="110" viewBox="0 0 110 110">
+            <circle cx="55" cy="55" r="40" fill="none" stroke="#EFF1F5" stroke-width="18"/>
+            <circle cx="55" cy="55" r="40" fill="none" stroke="#0D9B76" stroke-width="18" stroke-dasharray="100 152" stroke-dashoffset="38" transform="rotate(-90 55 55)"/>
+            <circle cx="55" cy="55" r="40" fill="none" stroke="#185FA5" stroke-width="18" stroke-dasharray="50 202" stroke-dashoffset="-62" transform="rotate(-90 55 55)"/>
+            <circle cx="55" cy="55" r="40" fill="none" stroke="#D85A30" stroke-width="18" stroke-dasharray="35 217" stroke-dashoffset="-112" transform="rotate(-90 55 55)"/>
+            <circle cx="55" cy="55" r="40" fill="none" stroke="#EF9F27" stroke-width="18" stroke-dasharray="25 227" stroke-dashoffset="-147" transform="rotate(-90 55 55)"/>
+            <text x="55" y="52" text-anchor="middle" font-size="14" font-weight="600" fill="#0A1628">40%</text>
+            <text x="55" y="64" text-anchor="middle" font-size="10" fill="#6B7280">General</text>
+          </svg>
+          <div class="donut-legend">
+            <div class="legend-item"><div class="legend-dot" style="background:#0D9B76"></div> General (40%)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#185FA5"></div> Cardiology (20%)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#D85A30"></div> Neuro (14%)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#EF9F27"></div> Dental (10%)</div>
+            <div class="legend-item"><div class="legend-dot" style="background:#EFF1F5"></div> Others (16%)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- APPOINTMENTS TABLE -->
+    <div class="table-card">
+      <div class="table-header">
+        <div class="table-title">Recent Appointments</div>
+        <div class="table-actions">
+          <input class="search-input" type="text" placeholder="Search bookings...">
+          <button class="filter-btn">⚙ Filter</button>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Booking ID</th>
+            <th>Patient</th>
+            <th>Doctor</th>
+            <th>Specialty</th>
+            <th>Date & Time</th>
+            <th>Fee</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="font-weight:500;color:var(--navy)">#MC-2847</td>
+            <td>Aminul Islam</td>
+            <td><div class="doc-cell"><div class="mini-avatar" style="background:#0D9B76">SA</div>Dr. Sarah Ahmed</div></td>
+            <td>Cardiology</td>
+            <td>Jun 11 · 10:00 AM</td>
+            <td style="font-weight:500">৳800</td>
+            <td><span class="status-badge status-confirmed">Confirmed</span></td>
+            <td><div class="action-btns"><button class="act-btn">View</button><button class="act-btn danger">Cancel</button></div></td>
+          </tr>
+          <tr>
+            <td style="font-weight:500;color:var(--navy)">#MC-2846</td>
+            <td>Fatema Begum</td>
+            <td><div class="doc-cell"><div class="mini-avatar" style="background:#185FA5">NI</div>Dr. Nadia Islam</div></td>
+            <td>Pediatrics</td>
+            <td>Jun 11 · 11:30 AM</td>
+            <td style="font-weight:500">৳600</td>
+            <td><span class="status-badge status-pending">Pending</span></td>
+            <td><div class="action-btns"><button class="act-btn approve">Approve</button><button class="act-btn danger">Reject</button></div></td>
+          </tr>
+          <tr>
+            <td style="font-weight:500;color:var(--navy)">#MC-2845</td>
+            <td>Karim Hassan</td>
+            <td><div class="doc-cell"><div class="mini-avatar" style="background:#D85A30">RK</div>Dr. Rafiq Khan</div></td>
+            <td>Neurology</td>
+            <td>Jun 11 · 2:00 PM</td>
+            <td style="font-weight:500">৳1,200</td>
+            <td><span class="status-badge status-confirmed">Confirmed</span></td>
+            <td><div class="action-btns"><button class="act-btn">View</button><button class="act-btn danger">Cancel</button></div></td>
+          </tr>
+          <tr>
+            <td style="font-weight:500;color:var(--navy)">#MC-2844</td>
+            <td>Rahela Akter</td>
+            <td><div class="doc-cell"><div class="mini-avatar" style="background:#0F6E56">FA</div>Dr. Fatema Akter</div></td>
+            <td>Dermatology</td>
+            <td>Jun 10 · 3:30 PM</td>
+            <td style="font-weight:500">৳900</td>
+            <td><span class="status-badge status-confirmed">Confirmed</span></td>
+            <td><div class="action-btns"><button class="act-btn">View</button><button class="act-btn danger">Cancel</button></div></td>
+          </tr>
+          <tr>
+            <td style="font-weight:500;color:var(--navy)">#MC-2843</td>
+            <td>Jamal Uddin</td>
+            <td><div class="doc-cell"><div class="mini-avatar" style="background:#7B1FA2">MH</div>Dr. Mahbub Hossain</div></td>
+            <td>Orthopedic</td>
+            <td>Jun 10 · 9:00 AM</td>
+            <td style="font-weight:500">৳1,500</td>
+            <td><span class="status-badge status-cancelled">Cancelled</span></td>
+            <td><div class="action-btns"><button class="act-btn">View</button><button class="act-btn approve">Refund</button></div></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="pagination-row">
+        <span>Showing 5 of 1,284 appointments</span>
+        <div class="page-btns">
+          <div class="pb active">1</div>
+          <div class="pb">2</div>
+          <div class="pb">3</div>
+          <div class="pb">›</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BOTTOM ROW -->
+    <div class="bottom-row">
+      <div class="bottom-card">
+        <div style="font-size:14px;font-weight:600;margin-bottom:16px">Top Performing Doctors</div>
+        <div class="doctor-row-item">
+          <div class="mini-avatar" style="background:#0D9B76;width:36px;height:36px;font-size:12px">SA</div>
+          <div class="dr-info"><div class="dr-name">Dr. Sarah Ahmed</div><div class="dr-spec">Cardiologist</div></div>
+          <div><div class="dr-rating">★ 4.9</div><div class="dr-bookings">312 bookings</div></div>
+        </div>
+        <div class="doctor-row-item">
+          <div class="mini-avatar" style="background:#185FA5;width:36px;height:36px;font-size:12px">NI</div>
+          <div class="dr-info"><div class="dr-name">Dr. Nadia Islam</div><div class="dr-spec">Pediatrician</div></div>
+          <div><div class="dr-rating">★ 5.0</div><div class="dr-bookings">421 bookings</div></div>
+        </div>
+        <div class="doctor-row-item">
+          <div class="mini-avatar" style="background:#0F6E56;width:36px;height:36px;font-size:12px">FA</div>
+          <div class="dr-info"><div class="dr-name">Dr. Fatema Akter</div><div class="dr-spec">Dermatologist</div></div>
+          <div><div class="dr-rating">★ 4.9</div><div class="dr-bookings">295 bookings</div></div>
+        </div>
+        <div class="doctor-row-item">
+          <div class="mini-avatar" style="background:#D85A30;width:36px;height:36px;font-size:12px">RK</div>
+          <div class="dr-info"><div class="dr-name">Dr. Rafiq Khan</div><div class="dr-spec">Neurologist</div></div>
+          <div><div class="dr-rating">★ 4.8</div><div class="dr-bookings">208 bookings</div></div>
+        </div>
+      </div>
+      <div class="bottom-card">
+        <div style="font-size:14px;font-weight:600;margin-bottom:16px">Recent Activity</div>
+        <div class="activity-item"><div class="activity-dot" style="background:var(--teal)"></div><div><div class="activity-text">New booking #MC-2847 confirmed for Dr. Sarah Ahmed</div><div class="activity-time">2 minutes ago</div></div></div>
+        <div class="activity-item"><div class="activity-dot" style="background:var(--amber)"></div><div><div class="activity-text">Dr. Nadia Islam updated her available slots for next week</div><div class="activity-time">15 minutes ago</div></div></div>
+        <div class="activity-item"><div class="activity-dot" style="background:var(--red)"></div><div><div class="activity-text">Booking #MC-2843 cancelled by patient Jamal Uddin</div><div class="activity-time">1 hour ago</div></div></div>
+        <div class="activity-item"><div class="activity-dot" style="background:#185FA5"></div><div><div class="activity-text">New patient registration: Rahela Akter from Dhaka</div><div class="activity-time">2 hours ago</div></div></div>
+        <div class="activity-item"><div class="activity-dot" style="background:var(--teal)"></div><div><div class="activity-text">Monthly revenue target 89% achieved — ৳98,400 of ৳1,10,000</div><div class="activity-time">Today, 9:00 AM</div></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

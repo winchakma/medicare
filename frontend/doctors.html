@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find Doctors — MediCare</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --navy: #0A1628; --teal: #0D9B76; --teal-light: #E1F5EE; --white: #ffffff;
+    --gray-50: #F8F9FB; --gray-100: #EFF1F5; --gray-200: #D8DCE6;
+    --gray-500: #6B7280; --gray-700: #374151; --gray-900: #111827;
+    --amber: #EF9F27;
+  }
+  body { font-family: 'Inter', sans-serif; color: var(--gray-900); background: var(--gray-50); }
+  a { text-decoration: none; color: inherit; }
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 0 5%; height: 64px; border-bottom: 1px solid var(--gray-200); background: white; position: sticky; top: 0; z-index: 100; }
+  .logo { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--navy); }
+  .logo span { color: var(--teal); }
+  .nav-links { display: flex; gap: 1.5rem; font-size: 14px; color: var(--gray-500); }
+  .nav-links a:hover { color: var(--teal); }
+  .btn-primary { padding: 8px 20px; border: none; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; background: var(--teal); color: white; }
+
+  .page-header { background: var(--navy); padding: 32px 5%; }
+  .page-header h1 { font-family: 'Playfair Display', serif; font-size: 28px; color: white; margin-bottom: 8px; }
+  .page-header p { color: rgba(255,255,255,0.55); font-size: 14px; }
+  .breadcrumb { display: flex; gap: 8px; font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 12px; }
+  .breadcrumb a { color: #5DCAA5; }
+
+  .content-area { display: grid; grid-template-columns: 280px 1fr; gap: 24px; padding: 28px 5%; max-width: 1300px; margin: 0 auto; }
+
+  /* FILTERS */
+  .filters-panel { background: white; border: 1px solid var(--gray-200); border-radius: 12px; padding: 20px; height: fit-content; position: sticky; top: 84px; }
+  .filter-section { margin-bottom: 24px; }
+  .filter-section:last-child { margin-bottom: 0; }
+  .filter-title { font-size: 13px; font-weight: 600; color: var(--gray-900); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+  .filter-option { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; cursor: pointer; }
+  .filter-option input { accent-color: var(--teal); width: 15px; height: 15px; }
+  .filter-option label { font-size: 13px; color: var(--gray-700); cursor: pointer; flex: 1; }
+  .filter-option .count { font-size: 12px; color: var(--gray-500); background: var(--gray-100); padding: 1px 7px; border-radius: 10px; }
+  .range-slider { width: 100%; accent-color: var(--teal); margin: 8px 0; }
+  .range-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--gray-500); }
+  .apply-filters { width: 100%; padding: 10px; background: var(--teal); color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 8px; }
+  .clear-filters { width: 100%; padding: 8px; background: transparent; color: var(--gray-500); border: 1px solid var(--gray-200); border-radius: 8px; font-size: 13px; cursor: pointer; margin-top: 8px; }
+
+  /* RESULTS */
+  .results-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .results-count { font-size: 14px; color: var(--gray-500); }
+  .results-count strong { color: var(--gray-900); }
+  .sort-select { padding: 8px 12px; border: 1px solid var(--gray-200); border-radius: 8px; font-size: 13px; color: var(--gray-700); outline: none; background: white; }
+  .active-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+  .filter-tag { display: flex; align-items: center; gap: 5px; background: var(--teal-light); border: 1px solid rgba(13,155,118,0.2); border-radius: 20px; padding: 4px 12px; font-size: 12px; color: #0D9B76; font-weight: 500; }
+  .filter-tag button { background: none; border: none; cursor: pointer; color: #0D9B76; font-size: 14px; line-height: 1; }
+
+  .doctors-list { display: flex; flex-direction: column; gap: 16px; }
+  .doctor-row { background: white; border: 1px solid var(--gray-200); border-radius: 14px; padding: 20px; display: grid; grid-template-columns: 70px 1fr auto; gap: 16px; align-items: start; transition: all .2s; cursor: pointer; }
+  .doctor-row:hover { border-color: var(--teal); box-shadow: 0 4px 20px rgba(13,155,118,0.08); }
+  .doc-avatar { width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 600; color: white; flex-shrink: 0; }
+  .doc-name { font-size: 16px; font-weight: 600; color: var(--gray-900); margin-bottom: 3px; }
+  .doc-specialty { font-size: 13px; color: var(--teal); font-weight: 500; margin-bottom: 8px; }
+  .doc-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .doc-tag { font-size: 11px; background: var(--gray-100); color: var(--gray-700); padding: 3px 10px; border-radius: 20px; }
+  .doc-stats { display: flex; gap: 16px; font-size: 12px; color: var(--gray-500); }
+  .doc-stats span { display: flex; align-items: center; gap: 4px; }
+  .rating-stars { color: var(--amber); }
+  .doc-right { text-align: right; display: flex; flex-direction: column; gap: 10px; align-items: flex-end; flex-shrink: 0; }
+  .avail-badge { font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: 500; }
+  .avail-today { background: #dcfce7; color: #166534; }
+  .avail-tomorrow { background: #fef3c7; color: #92400e; }
+  .doc-fee { font-size: 20px; font-weight: 600; color: var(--navy); }
+  .doc-fee-label { font-size: 11px; color: var(--gray-500); margin-top: -2px; }
+  .book-btn { padding: 9px 20px; background: var(--teal); color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; }
+  .book-btn:hover { background: #0b8a67; }
+  .save-btn { padding: 8px; background: transparent; border: 1px solid var(--gray-200); border-radius: 8px; cursor: pointer; font-size: 16px; }
+
+  .pagination { display: flex; gap: 8px; justify-content: center; margin-top: 32px; }
+  .page-btn { width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--gray-200); background: white; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--gray-700); }
+  .page-btn.active { background: var(--teal); color: white; border-color: var(--teal); }
+  .page-btn:hover:not(.active) { border-color: var(--teal); color: var(--teal); }
+
+  @media(max-width:768px) { .content-area { grid-template-columns: 1fr; } .filters-panel { position: static; } .nav-links { display:none; } .doctor-row { grid-template-columns: 56px 1fr; } .doc-right { display: none; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo"><a href="index.html">Medi<span>Care</span></a></div>
+  <div class="nav-links">
+    <a href="doctors.html" style="color:var(--teal)">Find Doctors</a>
+    <a href="#">Specialties</a>
+    <a href="#">Health Blog</a>
+  </div>
+  <button class="btn-primary" onclick="location.href='login.html'">Sign In</button>
+</nav>
+
+<div class="page-header">
+  <div class="breadcrumb"><a href="index.html">Home</a> <span>›</span> <span>Find Doctors</span></div>
+  <h1>Find Your Doctor</h1>
+  <p>Browse 500+ verified specialists across Bangladesh</p>
+</div>
+
+<div class="content-area">
+  <!-- FILTERS -->
+  <aside class="filters-panel">
+    <div class="filter-section">
+      <div class="filter-title">Specialty</div>
+      <div class="filter-option"><input type="checkbox" id="s1" checked><label for="s1">Cardiologist</label><span class="count">48</span></div>
+      <div class="filter-option"><input type="checkbox" id="s2"><label for="s2">Neurologist</label><span class="count">32</span></div>
+      <div class="filter-option"><input type="checkbox" id="s3"><label for="s3">Pediatrician</label><span class="count">41</span></div>
+      <div class="filter-option"><input type="checkbox" id="s4"><label for="s4">Dermatologist</label><span class="count">38</span></div>
+      <div class="filter-option"><input type="checkbox" id="s5"><label for="s5">Dentist</label><span class="count">67</span></div>
+      <div class="filter-option"><input type="checkbox" id="s6"><label for="s6">General Physician</label><span class="count">95</span></div>
+    </div>
+    <div class="filter-section">
+      <div class="filter-title">Availability</div>
+      <div class="filter-option"><input type="checkbox" id="a1" checked><label for="a1">Available Today</label></div>
+      <div class="filter-option"><input type="checkbox" id="a2"><label for="a2">Tomorrow</label></div>
+      <div class="filter-option"><input type="checkbox" id="a3"><label for="a3">This Week</label></div>
+      <div class="filter-option"><input type="checkbox" id="a4"><label for="a4">Video Consult</label></div>
+    </div>
+    <div class="filter-section">
+      <div class="filter-title">Consultation Fee</div>
+      <input type="range" class="range-slider" min="200" max="3000" value="1500" id="feeRange" oninput="document.getElementById('feeVal').textContent='৳'+this.value">
+      <div class="range-labels"><span>৳200</span><span id="feeVal">৳1500</span><span>৳3000</span></div>
+    </div>
+    <div class="filter-section">
+      <div class="filter-title">Rating</div>
+      <div class="filter-option"><input type="radio" name="rating" id="r5" checked><label for="r5">★★★★★ 5.0 only</label></div>
+      <div class="filter-option"><input type="radio" name="rating" id="r4"><label for="r4">★★★★☆ 4.0 & above</label></div>
+      <div class="filter-option"><input type="radio" name="rating" id="r3"><label for="r3">★★★☆☆ 3.0 & above</label></div>
+    </div>
+    <div class="filter-section">
+      <div class="filter-title">Experience</div>
+      <div class="filter-option"><input type="checkbox" id="e1"><label for="e1">0–5 years</label></div>
+      <div class="filter-option"><input type="checkbox" id="e2" checked><label for="e2">5–10 years</label></div>
+      <div class="filter-option"><input type="checkbox" id="e3"><label for="e3">10+ years</label></div>
+    </div>
+    <button class="apply-filters">Apply Filters</button>
+    <button class="clear-filters">Clear All</button>
+  </aside>
+
+  <!-- RESULTS -->
+  <main>
+    <div class="results-header">
+      <div class="results-count">Showing <strong>247</strong> doctors</div>
+      <select class="sort-select">
+        <option>Sort: Most Relevant</option>
+        <option>Rating: High to Low</option>
+        <option>Fee: Low to High</option>
+        <option>Experience: Most</option>
+        <option>Availability: Soonest</option>
+      </select>
+    </div>
+    <div class="active-filters">
+      <div class="filter-tag">Cardiologist <button>×</button></div>
+      <div class="filter-tag">Available Today <button>×</button></div>
+      <div class="filter-tag">5–10 yrs exp <button>×</button></div>
+    </div>
+
+    <div class="doctors-list">
+      <div class="doctor-row" onclick="location.href='doctor-profile.html'">
+        <div class="doc-avatar" style="background:#0D9B76">SA</div>
+        <div>
+          <div class="doc-name">Dr. Sarah Ahmed</div>
+          <div class="doc-specialty">Cardiologist · MBBS, MD (Cardiology)</div>
+          <div class="doc-tags"><span class="doc-tag">Heart Disease</span><span class="doc-tag">ECG</span><span class="doc-tag">Hypertension</span></div>
+          <div class="doc-stats">
+            <span><span class="rating-stars">★★★★★</span> 4.9 (312 reviews)</span>
+            <span>📍 Dhaka Medical</span>
+            <span>12 yrs experience</span>
+          </div>
+        </div>
+        <div class="doc-right">
+          <span class="avail-badge avail-today">Available Today</span>
+          <div><div class="doc-fee">৳800</div><div class="doc-fee-label">per consultation</div></div>
+          <div style="display:flex;gap:8px">
+            <button class="save-btn">♡</button>
+            <button class="book-btn" onclick="location.href='booking.html'">Book Slot</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="doctor-row" onclick="location.href='doctor-profile.html'">
+        <div class="doc-avatar" style="background:#D85A30">RK</div>
+        <div>
+          <div class="doc-name">Dr. Rafiq Khan</div>
+          <div class="doc-specialty">Neurologist · MBBS, MD (Neurology)</div>
+          <div class="doc-tags"><span class="doc-tag">Migraine</span><span class="doc-tag">Stroke</span><span class="doc-tag">Epilepsy</span></div>
+          <div class="doc-stats">
+            <span><span class="rating-stars">★★★★★</span> 4.8 (208 reviews)</span>
+            <span>📍 Chittagong</span>
+            <span>9 yrs experience</span>
+          </div>
+        </div>
+        <div class="doc-right">
+          <span class="avail-badge avail-today">Available Today</span>
+          <div><div class="doc-fee">৳1,200</div><div class="doc-fee-label">per consultation</div></div>
+          <div style="display:flex;gap:8px">
+            <button class="save-btn">♡</button>
+            <button class="book-btn" onclick="location.href='booking.html'">Book Slot</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="doctor-row" onclick="location.href='doctor-profile.html'">
+        <div class="doc-avatar" style="background:#185FA5">NI</div>
+        <div>
+          <div class="doc-name">Dr. Nadia Islam</div>
+          <div class="doc-specialty">Pediatrician · MBBS, DCH</div>
+          <div class="doc-tags"><span class="doc-tag">Child Health</span><span class="doc-tag">Vaccination</span><span class="doc-tag">Nutrition</span></div>
+          <div class="doc-stats">
+            <span><span class="rating-stars">★★★★★</span> 5.0 (421 reviews)</span>
+            <span>📍 Dhaka</span>
+            <span>7 yrs experience</span>
+          </div>
+        </div>
+        <div class="doc-right">
+          <span class="avail-badge avail-today">Available Today</span>
+          <div><div class="doc-fee">৳600</div><div class="doc-fee-label">per consultation</div></div>
+          <div style="display:flex;gap:8px">
+            <button class="save-btn">♡</button>
+            <button class="book-btn" onclick="location.href='booking.html'">Book Slot</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="doctor-row" onclick="location.href='doctor-profile.html'">
+        <div class="doc-avatar" style="background:#7B1FA2">MH</div>
+        <div>
+          <div class="doc-name">Dr. Mahbub Hossain</div>
+          <div class="doc-specialty">Orthopedic Surgeon · MBBS, MS (Ortho)</div>
+          <div class="doc-tags"><span class="doc-tag">Knee Surgery</span><span class="doc-tag">Spine</span><span class="doc-tag">Sports Injury</span></div>
+          <div class="doc-stats">
+            <span><span class="rating-stars">★★★★☆</span> 4.7 (187 reviews)</span>
+            <span>📍 Sylhet</span>
+            <span>15 yrs experience</span>
+          </div>
+        </div>
+        <div class="doc-right">
+          <span class="avail-badge avail-tomorrow">Tomorrow</span>
+          <div><div class="doc-fee">৳1,500</div><div class="doc-fee-label">per consultation</div></div>
+          <div style="display:flex;gap:8px">
+            <button class="save-btn">♡</button>
+            <button class="book-btn" onclick="location.href='booking.html'">Book Slot</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="doctor-row" onclick="location.href='doctor-profile.html'">
+        <div class="doc-avatar" style="background:#0F6E56">FA</div>
+        <div>
+          <div class="doc-name">Dr. Fatema Akter</div>
+          <div class="doc-specialty">Dermatologist · MBBS, DDV</div>
+          <div class="doc-tags"><span class="doc-tag">Acne</span><span class="doc-tag">Eczema</span><span class="doc-tag">Skin Allergy</span></div>
+          <div class="doc-stats">
+            <span><span class="rating-stars">★★★★★</span> 4.9 (295 reviews)</span>
+            <span>📍 Dhaka</span>
+            <span>8 yrs experience</span>
+          </div>
+        </div>
+        <div class="doc-right">
+          <span class="avail-badge avail-today">Available Today</span>
+          <div><div class="doc-fee">৳900</div><div class="doc-fee-label">per consultation</div></div>
+          <div style="display:flex;gap:8px">
+            <button class="save-btn">♡</button>
+            <button class="book-btn" onclick="location.href='booking.html'">Book Slot</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pagination">
+      <button class="page-btn active">1</button>
+      <button class="page-btn">2</button>
+      <button class="page-btn">3</button>
+      <button class="page-btn">…</button>
+      <button class="page-btn">12</button>
+      <button class="page-btn">›</button>
+    </div>
+  </main>
+</div>
+
+</body>
+</html>

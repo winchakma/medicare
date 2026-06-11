@@ -18,17 +18,17 @@
   </div>
 </nav>
 
-<div class="page-wrap">
+<div class="page-wrap" id="profile-container" style="display:none;">
   <!-- MAIN PROFILE -->
   <div>
     <div class="profile-main">
       <div class="profile-banner"></div>
       <div class="profile-banner-content">
         <div class="avatar-wrap">
-          <div class="doc-avatar-lg">SA</div>
+          <div id="prof-avatar" class="doc-avatar-lg">SA</div>
           <div class="avatar-info">
-            <div class="doc-name-lg">Dr. Sarah Miller</div>
-            <div class="doc-spec-lg">Cardiologist · Senior Consultant</div>
+            <div id="prof-name" class="doc-name-lg">Dr. Sarah Miller</div>
+            <div id="prof-spec" class="doc-spec-lg">Cardiologist · Senior Consultant</div>
             <span class="verified-badge">✓ Verified Doctor</span>
           </div>
           <div class="profile-actions">
@@ -38,25 +38,25 @@
         </div>
       </div>
       <div class="profile-stats">
-        <div class="stat-box"><div class="stat-val">4.9★</div><div class="stat-lbl">Rating</div></div>
+        <div class="stat-box"><div class="stat-val">5.0★</div><div class="stat-lbl">Rating</div></div>
         <div class="stat-box"><div class="stat-val">312</div><div class="stat-lbl">Reviews</div></div>
-        <div class="stat-box"><div class="stat-val">12 yrs</div><div class="stat-lbl">Experience</div></div>
+        <div class="stat-box"><div id="prof-exp-stat" class="stat-val">0 yrs</div><div class="stat-lbl">Experience</div></div>
         <div class="stat-box"><div class="stat-val">2,400+</div><div class="stat-lbl">Patients</div></div>
       </div>
       <div class="profile-body">
         <!-- ABOUT -->
         <div class="profile-section">
           <div class="section-sep">About</div>
-          <p>Dr. Sarah Miller is a highly experienced Cardiologist with over 12 years of practice at New York Medical College & Hospital. She specializes in interventional cardiology, heart failure management, and preventive cardiac care. Dr. Ahmed completed her MBBS from BUET and MD (Cardiology) from BSMMU, and has received advanced training at the Apollo Hospital, India.</p>
+          <p id="prof-bio-text">No bio provided yet.</p>
         </div>
         <!-- INFO -->
         <div class="profile-section">
           <div class="section-sep">Clinic Information</div>
           <div class="info-grid">
-            <div class="info-item"><div class="info-label">Hospital</div><div class="info-value">New York Medical College</div></div>
-            <div class="info-item"><div class="info-label">Location</div><div class="info-value">New York, Bangladesh</div></div>
+            <div class="info-item"><div class="info-label">Hospital</div><div class="info-value">MediCare Network</div></div>
+            <div class="info-item"><div class="info-label">Location</div><div id="prof-loc-text" class="info-value">Online</div></div>
             <div class="info-item"><div class="info-label">Consultation</div><div class="info-value">In-Person & Video</div></div>
-            <div class="info-item"><div class="info-label">Languages</div><div class="info-value">Bangla, English</div></div>
+            <div class="info-item"><div class="info-label">Languages</div><div class="info-value">English, Local</div></div>
           </div>
         </div>
         <!-- EXPERTISE -->
@@ -117,38 +117,19 @@
   <div class="booking-sidebar">
     <div class="book-card">
       <div class="book-card-title">Book an Appointment</div>
-      <div class="book-price">$80</div>
+      <div id="prof-fee-text" class="book-price">$0</div>
       <div class="book-price-label">per consultation</div>
-      <div class="consult-types">
-        <div class="consult-type active">🏥 In-Person</div>
-        <div class="consult-type">📹 Video Call</div>
+      
+      <div class="slot-label" style="margin-top:20px;">Available Weekly Schedule</div>
+      <div id="prof-schedule-list" style="font-size:14px; color:var(--gray-700); margin-bottom:20px;">
+        <!-- Schedule will be injected here -->
       </div>
-      <div class="slot-label">Select Date</div>
-      <div class="date-row">
-        <div class="date-btn active"><span class="day-name">MON</span>Jun 11</div>
-        <div class="date-btn"><span class="day-name">TUE</span>Jun 12</div>
-        <div class="date-btn"><span class="day-name">WED</span>Jun 13</div>
-        <div class="date-btn"><span class="day-name">THU</span>Jun 14</div>
-        <div class="date-btn"><span class="day-name">FRI</span>Jun 15</div>
-      </div>
-      <div class="slot-label">Available Slots</div>
-      <div class="slots-grid">
-        <div class="slot booked">9:00 AM</div>
-        <div class="slot booked">9:30 AM</div>
-        <div class="slot active">10:00 AM</div>
-        <div class="slot">10:30 AM</div>
-        <div class="slot">11:00 AM</div>
-        <div class="slot booked">11:30 AM</div>
-        <div class="slot">2:00 PM</div>
-        <div class="slot">2:30 PM</div>
-        <div class="slot">3:00 PM</div>
-      </div>
-      <button class="book-cta" onclick="location.href='booking.html'">Confirm Appointment →</button>
-      <button class="video-cta">📹 Video Consult Instead</button>
+      
+      <button class="book-cta" id="btn-book-now">Proceed to Booking →</button>
     </div>
     <div class="book-card" style="background:var(--gray-50)">
       <div style="font-size:13px;font-weight:600;color:var(--navy);margin-bottom:8px">📍 Location</div>
-      <div style="font-size:13px;color:var(--gray-700)">New York Medical College & Hospital<br>New York — 1000</div>
+      <div id="prof-loc-sidebar" style="font-size:13px;color:var(--gray-700)">Online</div>
       <div style="margin-top:10px;font-size:12px;color:var(--teal);font-weight:500;cursor:pointer">Get Directions →</div>
     </div>
   </div>
@@ -191,6 +172,76 @@
 </footer>
 <script src="js/config.js"></script>
 <script src="js/script.js?v=2"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const doctorId = urlParams.get('id');
+    
+    if(!doctorId) {
+      document.body.innerHTML = '<div style="padding:100px;text-align:center;"><h2>Doctor not found</h2><a href="doctors.html" style="color:var(--teal)">Go back</a></div>';
+      return;
+    }
+
+    try {
+      const res = await fetch(`${window.MEDICARE_API_URL || 'http://localhost:8000'}/api/doctors/${doctorId}`);
+      if(res.ok) {
+        const doc = await res.json();
+        
+        // Populate profile header
+        document.title = `Dr. ${doc.last_name} — MediCare`;
+        document.getElementById('prof-name').innerText = `Dr. ${doc.first_name} ${doc.last_name}`;
+        document.getElementById('prof-spec').innerText = `${doc.specialty || 'General'} · ${doc.experience_years || 0} yrs experience`;
+        
+        let init = "Dr";
+        if(doc.first_name && doc.last_name) init = doc.first_name[0] + doc.last_name[0];
+        const avatarEl = document.getElementById('prof-avatar');
+        if(doc.avatar_url) {
+          avatarEl.innerHTML = `<img src="${doc.avatar_url}" style="width:100%;height:100%;object-fit:cover;">`;
+          avatarEl.style.background = 'transparent';
+        } else {
+          avatarEl.innerHTML = init;
+        }
+
+        // Populate stats & bio
+        document.getElementById('prof-exp-stat').innerText = `${doc.experience_years || 0} yrs`;
+        document.getElementById('prof-bio-text').innerText = doc.bio || 'No professional bio provided yet.';
+        
+        // Populate location and fee
+        const loc = doc.location || 'Online / Not set';
+        document.getElementById('prof-loc-text').innerText = loc;
+        document.getElementById('prof-loc-sidebar').innerText = loc;
+        document.getElementById('prof-fee-text').innerText = `$${doc.fee_per_visit || 0}`;
+
+        // Populate schedule
+        const schedList = document.getElementById('prof-schedule-list');
+        schedList.innerHTML = '';
+        if(doc.schedule && Object.keys(doc.schedule).length > 0) {
+            let hasSchedule = false;
+            ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].forEach(day => {
+                if(doc.schedule[day] && doc.schedule[day].length > 0) {
+                    hasSchedule = true;
+                    schedList.innerHTML += `<div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--gray-200);">
+                        <span style="font-weight:500;">${day}</span>
+                        <span>${doc.schedule[day][0].start} - ${doc.schedule[day][0].end}</span>
+                    </div>`;
+                }
+            });
+            if(!hasSchedule) schedList.innerHTML = '<i>No schedule available.</i>';
+        } else {
+            schedList.innerHTML = '<i>No schedule available.</i>';
+        }
+
+        document.getElementById('btn-book-now').onclick = () => location.href = `booking.html?id=${doc._id}`;
+        
+        document.getElementById('profile-container').style.display = 'block';
+      } else {
+        document.body.innerHTML = '<div style="padding:100px;text-align:center;"><h2>Doctor not found</h2><a href="doctors.html" style="color:var(--teal)">Go back</a></div>';
+      }
+    } catch(e) {
+      console.error(e);
+    }
+  });
+</script>
 
 <!-- AUTH MODAL -->
 <div id="auth-modal" class="auth-modal-overlay">

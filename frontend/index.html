@@ -115,83 +115,8 @@
     </div>
     <a href="doctors.html" class="view-all">See all doctors →</a>
   </div>
-  <div class="doctors-grid">
-    <div class="doctor-card" onclick="location.href='doctor-profile.html'">
-      <div class="doctor-card-img">
-        <img src="image/pexels-mikhail-nilov-8942498.jpg" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
-        <div class="availability-badge">Available Today</div>
-      </div>
-      <div class="doctor-info">
-        <div class="doctor-name">Dr. Sarah Miller</div>
-        <div class="doctor-specialty">Cardiologist</div>
-        <div class="doctor-meta">
-          <span><span class="stars">★★★★★</span> 4.9</span>
-          <span>📍 New York</span>
-          <span>12 yrs exp</span>
-        </div>
-        <div class="doctor-fee">
-          <div><div class="fee">$80</div><div class="fee-label">per visit</div></div>
-          <button class="book-mini" onclick="location.href='booking.html'">Book Now</button>
-        </div>
-      </div>
-    </div>
-    <div class="doctor-card" onclick="location.href='doctor-profile.html'">
-      <div class="doctor-card-img" style="background: linear-gradient(135deg, #FFE4E1, #F5C4B3)">
-        <img src="image/pexels-pavel-danilyuk-7108238.jpg" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
-        <div class="availability-badge">Available Today</div>
-      </div>
-      <div class="doctor-info">
-        <div class="doctor-name">Dr. Richard Kane</div>
-        <div class="doctor-specialty">Neurologist</div>
-        <div class="doctor-meta">
-          <span><span class="stars">★★★★★</span> 4.8</span>
-          <span>📍 Los Angeles</span>
-          <span>9 yrs exp</span>
-        </div>
-        <div class="doctor-fee">
-          <div><div class="fee">$120</div><div class="fee-label">per visit</div></div>
-          <button class="book-mini" onclick="location.href='booking.html'">Book Now</button>
-        </div>
-      </div>
-    </div>
-    <div class="doctor-card" onclick="location.href='doctor-profile.html'">
-      <div class="doctor-card-img" style="background: linear-gradient(135deg, #E3F2FD, #B5D4F4)">
-        <img src="image/pexels-rdne-6129676.jpg" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
-        <div class="availability-badge">Available Today</div>
-      </div>
-      <div class="doctor-info">
-        <div class="doctor-name">Dr. Natalie Irons</div>
-        <div class="doctor-specialty">Pediatrician</div>
-        <div class="doctor-meta">
-          <span><span class="stars">★★★★★</span> 5.0</span>
-          <span>📍 New York</span>
-          <span>7 yrs exp</span>
-        </div>
-        <div class="doctor-fee">
-          <div><div class="fee">$60</div><div class="fee-label">per visit</div></div>
-          <button class="book-mini" onclick="location.href='booking.html'">Book Now</button>
-        </div>
-      </div>
-    </div>
-    <div class="doctor-card" onclick="location.href='doctor-profile.html'">
-      <div class="doctor-card-img" style="background: linear-gradient(135deg, #F3E5F5, #E1BEE7)">
-        <img src="image/pexels-tima-miroshnichenko-6235010.jpg" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">
-        <span class="availability-badge" style="background:#f59e0b">Tomorrow</span>
-      </div>
-      <div class="doctor-info">
-        <div class="doctor-name">Dr. Matthew Hayes</div>
-        <div class="doctor-specialty">Orthopedic Surgeon</div>
-        <div class="doctor-meta">
-          <span><span class="stars">★★★★☆</span> 4.7</span>
-          <span>📍 Chicago</span>
-          <span>15 yrs exp</span>
-        </div>
-        <div class="doctor-fee">
-          <div><div class="fee">$150</div><div class="fee-label">per visit</div></div>
-          <button class="book-mini" onclick="location.href='booking.html'">Book Now</button>
-        </div>
-      </div>
-    </div>
+  <div class="doctors-grid" id="featured-doctors-grid">
+    <div style="text-align:center; color:var(--gray-500); grid-column:1/-1; padding:40px;">Loading featured doctors...</div>
   </div>
 </section>
 
@@ -272,6 +197,59 @@
 </footer>
 <script src="js/config.js"></script>
 <script src="js/script.js?v=2"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const res = await fetch(`${window.MEDICARE_API_URL || 'http://localhost:8000'}/api/doctors/list`);
+      if(res.ok) {
+        const doctors = await res.json();
+        const gridEl = document.getElementById('featured-doctors-grid');
+        gridEl.innerHTML = '';
+        
+        if(doctors.length === 0) {
+          gridEl.innerHTML = '<div style="text-align:center; color:var(--gray-500); grid-column:1/-1;">No doctors found.</div>';
+          return;
+        }
+
+        // Show max 4 doctors
+        doctors.slice(0, 4).forEach(doc => {
+          let init = "Dr";
+          if(doc.first_name && doc.last_name) init = doc.first_name[0] + doc.last_name[0];
+          
+          let avatarHtml = `<div style="width:100%; height:100%; border-radius:50%; background:var(--teal); display:flex; align-items:center; justify-content:center; color:white; font-size:40px; font-weight:600;">${init}</div>`;
+          if(doc.avatar_url) {
+            avatarHtml = `<img src="${doc.avatar_url}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+          }
+
+          const html = `
+          <div class="doctor-card" onclick="location.href='doctor-profile.html?id=${doc._id}'">
+            <div class="doctor-card-img" style="background:var(--gray-50)">
+              ${avatarHtml}
+              <div class="availability-badge">Verified</div>
+            </div>
+            <div class="doctor-info">
+              <div class="doctor-name">Dr. ${doc.first_name} ${doc.last_name}</div>
+              <div class="doctor-specialty">${doc.specialty || 'General'}</div>
+              <div class="doctor-meta">
+                <span><span class="stars">★★★★★</span> 5.0</span>
+                <span>📍 ${doc.location || 'Online'}</span>
+                <span>${doc.experience_years || 0} yrs exp</span>
+              </div>
+              <div class="doctor-fee">
+                <div><div class="fee">$${doc.fee_per_visit || 0}</div><div class="fee-label">per visit</div></div>
+                <button class="book-mini" onclick="event.stopPropagation(); location.href='booking.html?id=${doc._id}'">Book Now</button>
+              </div>
+            </div>
+          </div>
+          `;
+          gridEl.innerHTML += html;
+        });
+      }
+    } catch(e) {
+      console.error(e);
+    }
+  });
+</script>
 
 <!-- AUTH MODAL -->
 <div id="auth-modal" class="auth-modal-overlay">

@@ -31,6 +31,18 @@ async def get_doctors():
     doctors = await User.find(User.role == "doctor", User.is_verified == True).to_list()
     return doctors
 
+from beanie import PydanticObjectId
+
+@router.get("/{doctor_id}")
+async def get_doctor(doctor_id: str):
+    try:
+        doctor = await User.get(PydanticObjectId(doctor_id))
+        if not doctor or doctor.role != "doctor":
+            raise HTTPException(status_code=404, detail="Doctor not found")
+        return doctor
+    except Exception:
+        raise HTTPException(status_code=404, detail="Invalid doctor ID")
+
 @router.get("/me")
 async def get_my_profile(current_user: User = Depends(get_current_user)):
     return current_user

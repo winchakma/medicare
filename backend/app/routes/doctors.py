@@ -28,7 +28,7 @@ class DoctorProfileUpdate(BaseModel):
 
 @router.get("/list")
 async def get_doctors():
-    doctors = await User.find(User.role == "doctor", User.is_verified == True).to_list()
+    doctors = await User.find(User.role == "doctor").to_list()
     return doctors
 
 from beanie import PydanticObjectId

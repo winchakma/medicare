@@ -42,6 +42,7 @@ class DoctorListOut(BaseModel):
     location: Optional[str] = None
     fee_per_visit: Optional[float] = None
     is_verified: bool = False
+    schedule: Optional[Dict[str, List[Dict[str, str]]]] = None
 
 @router.get("/list", response_model=List[DoctorListOut])
 async def get_doctors():

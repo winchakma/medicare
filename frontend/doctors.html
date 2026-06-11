@@ -67,16 +67,16 @@
       <div class="filter-title">Availability</div>
       <div class="filter-options">
         <div class="filter-option">
-          <div class="checkbox-wrapper"><input type="checkbox" id="a1"><label for="a1">Available Today</label></div>
+          <div class="checkbox-wrapper"><input type="checkbox" id="a1" class="avail-filter" value="today"><label for="a1">Available Today</label></div>
         </div>
         <div class="filter-option">
-          <div class="checkbox-wrapper"><input type="checkbox" id="a2"><label for="a2">Tomorrow</label></div>
+          <div class="checkbox-wrapper"><input type="checkbox" id="a2" class="avail-filter" value="tomorrow"><label for="a2">Tomorrow</label></div>
         </div>
         <div class="filter-option">
-          <div class="checkbox-wrapper"><input type="checkbox" id="a3"><label for="a3">This Week</label></div>
+          <div class="checkbox-wrapper"><input type="checkbox" id="a3" class="avail-filter" value="thisweek"><label for="a3">This Week</label></div>
         </div>
         <div class="filter-option">
-          <div class="checkbox-wrapper"><input type="checkbox" id="a4"><label for="a4">Video Consult</label></div>
+          <div class="checkbox-wrapper"><input type="checkbox" id="a4" class="avail-filter" value="video"><label for="a4">Video Consult</label></div>
         </div>
       </div>
     </div>
@@ -173,6 +173,41 @@
           if (range === '10+') return exp > 10;
           return false;
         });
+      });
+    }
+
+    // Availability filter
+    const selectedAvails = Array.from(document.querySelectorAll('.avail-filter:checked')).map(cb => cb.value);
+    if (selectedAvails.length > 0) {
+      const todayIndex = new Date().getDay();
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const todayName = days[todayIndex];
+      const tomorrowName = days[(todayIndex + 1) % 7];
+
+      filtered = filtered.filter(doc => {
+        let matchDate = true;
+        const dateFilters = selectedAvails.filter(v => v !== 'video');
+        if (dateFilters.length > 0) {
+          matchDate = dateFilters.some(val => {
+            if (val === 'today') {
+              return doc.schedule && doc.schedule[todayName] && doc.schedule[todayName].length > 0;
+            }
+            if (val === 'tomorrow') {
+              return doc.schedule && doc.schedule[tomorrowName] && doc.schedule[tomorrowName].length > 0;
+            }
+            if (val === 'thisweek') {
+              return doc.schedule && Object.values(doc.schedule).some(slots => slots && slots.length > 0);
+            }
+            return false;
+          });
+        }
+        
+        let matchVideo = true;
+        if (selectedAvails.includes('video')) {
+          matchVideo = true;
+        }
+        
+        return matchDate && matchVideo;
       });
     }
 

@@ -156,12 +156,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 5. All Doctors (Grid)
     if (docsRes2 && docsRes2.ok) {
       const docs = await docsRes2.json();
+      window.allDoctorsMap = {};
+      docs.forEach(d => {
+        window.allDoctorsMap[d.id] = d;
+      });
       const grid = document.getElementById('admin-doctors-grid');
       if (grid) {
         grid.innerHTML = '';
         docs.forEach(d => {
           grid.innerHTML += `
-            <div class="doctor-card" style="border:1px solid #E5E7EB; border-radius:12px; padding:20px; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.02); cursor:pointer; transition:transform 0.2s;" onclick='openDoctorProfile(${JSON.stringify(d).replace(/'/g, "&#39;")})' onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+            <div class="doctor-card" style="border:1px solid #E5E7EB; border-radius:12px; padding:20px; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.02); cursor:pointer; transition:transform 0.2s;" onclick="openDoctorProfile('${d.id}')" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
               <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
                 ${d.avatar_url ? `<img src="${d.avatar_url.startsWith('http') ? d.avatar_url : window.MEDICARE_API_URL + d.avatar_url}" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';" style="width:50px; height:50px; border-radius:50%; object-fit:cover; object-position:center;"><div class="mini-avatar" style="width:50px; height:50px; font-size:16px; background:#185FA5; display:none;">${d.name.substring(4, 6).toUpperCase()}</div>` : `<div class="mini-avatar" style="width:50px; height:50px; font-size:16px; background:#185FA5;">${d.name.substring(4, 6).toUpperCase()}</div>`}
                 <div>
@@ -271,7 +275,13 @@ async function handleAdminSettings(e) {
 }
 
 
-window.openDoctorProfile = function(d) {
+window.openDoctorProfile = function(dOrId) {
+  let d = dOrId;
+  if (typeof dOrId === 'string' && window.allDoctorsMap) {
+    d = window.allDoctorsMap[dOrId];
+  }
+  if (!d) return;
+
   // Hide all tabs
   document.querySelectorAll('.admin-tab').forEach(t => t.style.display = 'none');
   // Remove active from navs

@@ -43,120 +43,41 @@ document.addEventListener("DOMContentLoaded", async () => {
     dateDisplay.innerText = today.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
   }
 
-  (async () => {
   try {
-    // 1. Fetch dashboard stats
-    const statsRes = await fetch(`${window.MEDICARE_API_URL}/api/admin/dashboard-stats`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (!statsRes.ok) throw new Error("Failed to load stats");
-    const stats = await statsRes.json();
+    // Fire all fetches concurrently!
+    const headers = { 'Authorization': `Bearer ${token}` };
+    
+    const [statsRes, apptsRes, docsRes, allApptsRes, docsRes2, patRes, actRes] = await Promise.all([
+      fetch(`${window.MEDICARE_API_URL}/api/admin/dashboard-stats`, { headers }).catch(e => null),
+      fetch(`${window.MEDICARE_API_URL}/api/admin/appointments`, { headers }).catch(e => null),
+      fetch(`${window.MEDICARE_API_URL}/api/admin/top-doctors`, { headers }).catch(e => null),
+      fetch(`${window.MEDICARE_API_URL}/api/admin/all-appointments`, { headers }).catch(e => null),
+      fetch(`${window.MEDICARE_API_URL}/api/admin/doctors`, { headers }).catch(e => null),
+      fetch(`${window.MEDICARE_API_URL}/api/admin/patients`, { headers }).catch(e => null),
+      fetch(`${window.MEDICARE_API_URL}/api/admin/recent-activity`, { headers }).catch(e => null)
+    ]);
 
-    document.getElementById('stat-total-bookings').innerText = stats.total_bookings.toLocaleString();
-    document.getElementById('stat-total-revenue').innerText = '$' + stats.total_revenue.toLocaleString();
-    document.getElementById('stat-active-doctors').innerText = stats.active_doctors.toLocaleString();
-    document.getElementById('stat-total-patients').innerText = stats.total_patients.toLocaleString();
-
-    } catch(e) {} })();
-
-(async () => {
-  try {
-    // 2. Fetch appointments
-    const apptsRes = await fetch(`${window.MEDICARE_API_URL}/api/admin/appointments`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (!apptsRes.ok) throw new Error("Failed to load appointments");
-    const appts = await apptsRes.json();
-
-    const tbody = document.getElementById('admin-appointments-list');
-    tbody.innerHTML = '';
-    appts.forEach(a => {
-      let statusClass = 'status-pending';
-      if (a.status === 'confirmed') statusClass = 'status-confirmed';
-      if (a.status === 'cancelled') statusClass = 'status-cancelled';
-
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td style="font-weight:500;color:var(--navy)">${a.booking_id}</td>
-        <td>${a.patient_name}</td>
-        <td><div class="doc-cell"><div class="mini-avatar" style="background:#0D9B76">${a.doctor_initials}</div>${a.doctor_name}</div></td>
-        <td>${a.specialty}</td>
-        <td>${a.date} &middot; ${a.time_slot}</td>
-        <td style="font-weight:500">$${a.fee}</td>
-        <td><span class="status-badge ${statusClass}">${a.status}</span></td>
-        <td><div class="action-btns"><button class="act-btn">View</button></div></td>
-      `;
-      tbody.appendChild(tr);
-    });
-
-    if (appts.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;">No recent appointments found.</td></tr>';
+    // 1. Stats
+    let stats = { total_bookings: 0, total_revenue: 0, active_doctors: 0, total_patients: 0 };
+    if (statsRes && statsRes.ok) {
+      stats = await statsRes.json();
+      document.getElementById('stat-total-bookings').innerText = stats.total_bookings.toLocaleString();
+      document.getElementById('stat-total-revenue').innerText = '$' + stats.total_revenue.toLocaleString();
+      document.getElementById('stat-active-doctors').innerText = stats.active_doctors.toLocaleString();
+      document.getElementById('stat-total-patients').innerText = stats.total_patients.toLocaleString();
     }
 
-    const pag = document.getElementById('admin-appointments-pagination');
-    if (pag) {
-      pag.innerHTML = `<span>Showing ${appts.length} of ${stats.total_bookings} appointments</span>
-        <div class="page-btns">
-          <div class="pb active">1</div>
-          <div class="pb">2</div>
-          <div class="pb">3</div>
-          <div class="pb">›</div>
-        </div>`;
-    }
-
-    } catch(e) {} })();
-
-(async () => {
-  try {
-    // 3. Fetch top doctors
-    const docsRes = await fetch(`${window.MEDICARE_API_URL}/api/admin/top-doctors`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (docsRes.ok) {
-      const topDocs = await docsRes.json();
-      const topDocsContainer = document.getElementById('top-doctors-list');
-      if (topDocsContainer) {
-        topDocsContainer.innerHTML = '<div style="font-size:14px;font-weight:600;margin-bottom:16px">Top Performing Doctors</div>';
-        
-        topDocs.forEach((d, i) => {
-          const colors = ['#0D9B76', '#185FA5', '#0F6E56', '#D85A30', '#7B1FA2'];
-          const color = colors[i % colors.length];
-          
-          topDocsContainer.innerHTML += `
-            <div class="doctor-row-item">
-              <div class="mini-avatar" style="background:${color};width:36px;height:36px;font-size:12px">${d.initials}</div>
-              <div class="dr-info"><div class="dr-name">${d.name}</div><div class="dr-spec">${d.specialty}</div></div>
-              <div><div class="dr-rating">★ ${d.rating}</div><div class="dr-bookings">${d.bookings} bookings</div></div>
-            </div>
-          `;
-        });
-
-        if (topDocs.length === 0) {
-          topDocsContainer.innerHTML += '<div style="padding:10px;text-align:center;color:#666;">No bookings yet.</div>';
-        }
-      }
-    }
-
-
-    } catch(e) {} })();
-
-(async () => {
-  try {
-    // 4. Fetch all appointments
-    try {
-      const allApptsRes = await fetch(`${window.MEDICARE_API_URL}/api/admin/all-appointments`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (allApptsRes.ok) {
-        const allAppts = await allApptsRes.json();
-        const allTbody = document.getElementById('all-appointments-list');
-        if (allTbody) {
-          allTbody.innerHTML = '';
-          allAppts.forEach(a => {
+    // 2. Recent Appointments
+    if (apptsRes && apptsRes.ok) {
+      const appts = await apptsRes.json();
+      const tbody = document.getElementById('admin-appointments-list');
+      if (tbody) {
+          tbody.innerHTML = '';
+          appts.forEach(a => {
             let statusClass = 'status-pending';
             if (a.status === 'confirmed') statusClass = 'status-confirmed';
             if (a.status === 'cancelled') statusClass = 'status-cancelled';
-            allTbody.innerHTML += `
+            tbody.innerHTML += `
               <tr>
                 <td style="font-weight:500;color:var(--navy)">${a.booking_id}</td>
                 <td>${a.patient_name}</td>
@@ -169,110 +90,141 @@ document.addEventListener("DOMContentLoaded", async () => {
               </tr>
             `;
           });
-          if (allAppts.length === 0) allTbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;">No appointments found.</td></tr>';
-        }
+          if (appts.length === 0) tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;">No recent appointments found.</td></tr>';
+          
+          const pag = document.getElementById('admin-appointments-pagination');
+          if (pag) {
+            pag.innerHTML = `<span>Showing ${appts.length} of ${stats.total_bookings} appointments</span>
+              <div class="page-btns">
+                <div class="pb active">1</div>
+                <div class="pb">2</div>
+                <div class="pb">3</div>
+                <div class="pb">›</div>
+              </div>`;
+          }
       }
-    } catch(e) {}
+    }
 
-    } catch(e) {} })();
-
-(async () => {
-  try {
-    // 5. Fetch Doctors
-    try {
-      const docsRes = await fetch(`${window.MEDICARE_API_URL}/api/admin/doctors`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (docsRes.ok) {
-        const docs = await docsRes.json();
-        const grid = document.getElementById('admin-doctors-grid');
-        if (grid) {
-          grid.innerHTML = '';
-          docs.forEach(d => {
-            grid.innerHTML += `
-              <div class="doctor-card" style="border:1px solid #E5E7EB; border-radius:12px; padding:20px; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.02); cursor:pointer; transition:transform 0.2s;" onclick='openDoctorProfile(${JSON.stringify(d).replace(/'/g, "&#39;")})' onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
-                <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
-                  ${d.avatar_url ? `<img src="${d.avatar_url.startsWith('http') ? d.avatar_url : window.MEDICARE_API_URL + d.avatar_url}" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';" style="width:50px; height:50px; border-radius:50%; object-fit:cover;"><div class="mini-avatar" style="width:50px; height:50px; font-size:16px; background:#185FA5; display:none;">${d.name.substring(4, 6).toUpperCase()}</div>` : `<div class="mini-avatar" style="width:50px; height:50px; font-size:16px; background:#185FA5;">${d.name.substring(4, 6).toUpperCase()}</div>`}
-                  <div>
-                    <h3 style="font-size:16px; font-weight:600; color:var(--navy); margin:0;">${d.name}</h3>
-                    <div style="font-size:13px; color:var(--gray-500);">${d.specialty}</div>
-                  </div>
-                </div>
-                <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:13px;">
-                  <div><strong>Email:</strong><br>${d.email}</div>
-                  <div><strong>Fee:</strong><br>$${d.fee}</div>
-                </div>
-                <div style="display:flex; gap:10px;">
-                  <button class="act-btn" style="flex:1;">View Profile</button>
-                </div>
-              </div>
-            `;
-          });
-          if (docs.length === 0) grid.innerHTML = '<div style="grid-column: 1 / -1; padding:20px; text-align:center;">No doctors found.</div>';
-        }
+    // 3. Top Doctors
+    if (docsRes && docsRes.ok) {
+      const topDocs = await docsRes.json();
+      const topDocsContainer = document.getElementById('top-doctors-list');
+      if (topDocsContainer) {
+        topDocsContainer.innerHTML = '<div style="font-size:14px;font-weight:600;margin-bottom:16px">Top Performing Doctors</div>';
+        topDocs.forEach((d, i) => {
+          const colors = ['#0D9B76', '#185FA5', '#0F6E56', '#D85A30', '#7B1FA2'];
+          const color = colors[i % colors.length];
+          topDocsContainer.innerHTML += `
+            <div class="doctor-row-item">
+              <div class="mini-avatar" style="background:${color};width:36px;height:36px;font-size:12px">${d.initials}</div>
+              <div class="dr-info"><div class="dr-name">${d.name}</div><div class="dr-spec">${d.specialty}</div></div>
+              <div><div class="dr-rating">★ ${d.rating}</div><div class="dr-bookings">${d.bookings} bookings</div></div>
+            </div>
+          `;
+        });
+        if (topDocs.length === 0) topDocsContainer.innerHTML += '<div style="padding:10px;text-align:center;color:#666;">No bookings yet.</div>';
       }
-    } catch(e) {}
+    }
 
-    } catch(e) {} })();
-
-(async () => {
-  try {
-    // 6. Fetch Patients
-    try {
-      const patRes = await fetch(`${window.MEDICARE_API_URL}/api/admin/patients`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (patRes.ok) {
-        const pats = await patRes.json();
-        const ptbody = document.getElementById('admin-patients-list');
-        if (ptbody) {
-          ptbody.innerHTML = '';
-          pats.forEach(p => {
-            const dateStr = new Date(p.created_at).toLocaleDateString();
-            ptbody.innerHTML += `
-              <tr>
-                <td style="color:var(--navy); font-weight:500;">${p.id.substring(0, 8)}...</td>
-                <td>${p.name}</td>
-                <td>${p.email}</td>
-                <td>${p.phone}</td>
-                <td>${dateStr}</td>
-              </tr>
-            `;
-          });
-          if (pats.length === 0) ptbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;">No patients found.</td></tr>';
-        }
+    // 4. All Appointments
+    if (allApptsRes && allApptsRes.ok) {
+      const allAppts = await allApptsRes.json();
+      const allTbody = document.getElementById('all-appointments-list');
+      if (allTbody) {
+        allTbody.innerHTML = '';
+        allAppts.forEach(a => {
+          let statusClass = 'status-pending';
+          if (a.status === 'confirmed') statusClass = 'status-confirmed';
+          if (a.status === 'cancelled') statusClass = 'status-cancelled';
+          allTbody.innerHTML += `
+            <tr>
+              <td style="font-weight:500;color:var(--navy)">${a.booking_id}</td>
+              <td>${a.patient_name}</td>
+              <td><div class="doc-cell"><div class="mini-avatar" style="background:#0D9B76">${a.doctor_initials}</div>${a.doctor_name}</div></td>
+              <td>${a.specialty}</td>
+              <td>${a.date} &middot; ${a.time_slot}</td>
+              <td style="font-weight:500">$${a.fee}</td>
+              <td><span class="status-badge ${statusClass}">${a.status}</span></td>
+              <td><div class="action-btns"><button class="act-btn">View</button></div></td>
+            </tr>
+          `;
+        });
+        if (allAppts.length === 0) allTbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;">No appointments found.</td></tr>';
       }
-    } catch(e) {}
+    }
 
-    } catch(e) {} })();
-
-(async () => {
-  try {
-    // 7. Fetch Recent Activity
-    try {
-      const actRes = await fetch(`${window.MEDICARE_API_URL}/api/admin/recent-activity`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      if (actRes.ok) {
-        const acts = await actRes.json();
-        const actDiv = document.getElementById('admin-recent-activity');
-        if (actDiv) {
-          actDiv.innerHTML = '';
-          acts.forEach(a => {
-            actDiv.innerHTML += `
-              <div class="activity-item">
-                <div class="activity-dot" style="background:${a.color}"></div>
+    // 5. All Doctors (Grid)
+    if (docsRes2 && docsRes2.ok) {
+      const docs = await docsRes2.json();
+      const grid = document.getElementById('admin-doctors-grid');
+      if (grid) {
+        grid.innerHTML = '';
+        docs.forEach(d => {
+          grid.innerHTML += `
+            <div class="doctor-card" style="border:1px solid #E5E7EB; border-radius:12px; padding:20px; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.02); cursor:pointer; transition:transform 0.2s;" onclick='openDoctorProfile(${JSON.stringify(d).replace(/'/g, "&#39;")})' onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
+              <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
+                ${d.avatar_url ? `<img src="${d.avatar_url.startsWith('http') ? d.avatar_url : window.MEDICARE_API_URL + d.avatar_url}" onerror="this.onerror=null; this.style.display='none'; this.nextElementSibling.style.display='flex';" style="width:50px; height:50px; border-radius:50%; object-fit:cover; background-position:center;"><div class="mini-avatar" style="width:50px; height:50px; font-size:16px; background:#185FA5; display:none;">${d.name.substring(4, 6).toUpperCase()}</div>` : `<div class="mini-avatar" style="width:50px; height:50px; font-size:16px; background:#185FA5;">${d.name.substring(4, 6).toUpperCase()}</div>`}
                 <div>
-                  <div class="activity-text">${a.text}</div>
-                  <div class="activity-time">${a.time_str}</div>
+                  <h3 style="font-size:16px; font-weight:600; color:var(--navy); margin:0;">${d.name}</h3>
+                  <div style="font-size:13px; color:var(--gray-500);">${d.specialty}</div>
                 </div>
               </div>
-            `;
-          });
-          if (acts.length === 0) actDiv.innerHTML = '<div style="padding:10px;text-align:center;color:#666;">No recent activity.</div>';
-        }
+              <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:13px;">
+                <div><strong>Email:</strong><br>${d.email}</div>
+                <div><strong>Fee:</strong><br>$${d.fee}</div>
+              </div>
+              <div style="display:flex; gap:10px;">
+                <button class="act-btn" style="flex:1;">View Profile</button>
+              </div>
+            </div>
+          `;
+        });
+        if (docs.length === 0) grid.innerHTML = '<div style="grid-column: 1 / -1; padding:20px; text-align:center;">No doctors found.</div>';
       }
-    } catch(e) {}
+    }
+
+    // 6. Patients
+    if (patRes && patRes.ok) {
+      const pats = await patRes.json();
+      const ptbody = document.getElementById('admin-patients-list');
+      if (ptbody) {
+        ptbody.innerHTML = '';
+        pats.forEach(p => {
+          const dateStr = new Date(p.created_at).toLocaleDateString();
+          ptbody.innerHTML += `
+            <tr>
+              <td style="color:var(--navy); font-weight:500;">${p.id.substring(0, 8)}...</td>
+              <td>${p.name}</td>
+              <td>${p.email}</td>
+              <td>${p.phone}</td>
+              <td>${dateStr}</td>
+            </tr>
+          `;
+        });
+        if (pats.length === 0) ptbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;">No patients found.</td></tr>';
+      }
+    }
+
+    // 7. Recent Activity
+    if (actRes && actRes.ok) {
+      const acts = await actRes.json();
+      const actDiv = document.getElementById('admin-recent-activity');
+      if (actDiv) {
+        actDiv.innerHTML = '';
+        acts.forEach(a => {
+          actDiv.innerHTML += `
+            <div class="activity-item">
+              <div class="activity-dot" style="background:${a.color}"></div>
+              <div>
+                <div class="activity-text">${a.text}</div>
+                <div class="activity-time">${a.time_str}</div>
+              </div>
+            </div>
+          `;
+        });
+        if (acts.length === 0) actDiv.innerHTML = '<div style="padding:10px;text-align:center;color:#666;">No recent activity.</div>';
+      }
+    }
 
     // Update Sidebar Badges
     const badge = document.getElementById('sidebar-appts-badge');
@@ -393,14 +345,12 @@ window.handleAdminAvatarUpload = async function(e) {
       msg.style.color = "green";
       document.querySelector('.user-avatar').style.backgroundImage = `url('${window.MEDICARE_API_URL}${data.avatar_url}')`;
       document.querySelector('.user-avatar').style.backgroundSize = 'cover';
-      document.querySelector('.user-avatar').style.backgroundPosition = 'center';
       document.querySelector('.user-avatar').innerText = '';
       
       const pv = document.getElementById('admin-settings-avatar-preview');
       if(pv) {
          pv.style.backgroundImage = `url('${window.MEDICARE_API_URL}${data.avatar_url}')`;
          pv.style.backgroundSize = 'cover';
-         pv.style.backgroundPosition = 'center';
          pv.innerText = '';
       }
     } else {
@@ -427,12 +377,10 @@ setTimeout(async () => {
         if (me.avatar_url) {
            av.style.backgroundImage = `url('${window.MEDICARE_API_URL}${me.avatar_url}')`;
            av.style.backgroundSize = 'cover';
-           av.style.backgroundPosition = 'center';
            av.innerText = '';
            if(pv) {
              pv.style.backgroundImage = `url('${window.MEDICARE_API_URL}${me.avatar_url}')`;
              pv.style.backgroundSize = 'cover';
-             pv.style.backgroundPosition = 'center';
              pv.innerText = '';
            }
         } else {

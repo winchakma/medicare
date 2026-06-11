@@ -26,9 +26,26 @@ class DoctorProfileUpdate(BaseModel):
     location: Optional[str] = None
     fee_per_visit: Optional[float] = None
 
-@router.get("/list")
+from beanie import PydanticObjectId
+from pydantic import Field
+
+class DoctorListOut(BaseModel):
+    id: Optional[PydanticObjectId] = Field(None, alias="_id")
+    email: str
+    first_name: str
+    last_name: str
+    phone: Optional[str] = None
+    avatar_url: Optional[str] = None
+    specialty: Optional[str] = None
+    bio: Optional[str] = None
+    experience_years: Optional[int] = None
+    location: Optional[str] = None
+    fee_per_visit: Optional[float] = None
+    is_verified: bool = False
+
+@router.get("/list", response_model=List[DoctorListOut])
 async def get_doctors():
-    doctors = await User.find(User.role == "doctor").to_list()
+    doctors = await User.find(User.role == "doctor").project(DoctorListOut).to_list()
     return doctors
 
 @router.get("/me")

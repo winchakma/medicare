@@ -35,7 +35,7 @@ body.index-body { background: var(--white); display: flex; flex-direction: colum
   .nav-item .icon { font-size: 16px; width: 20px; text-align: center; }
   .nav-item .badge { margin-left: auto; background: var(--red); color: white; font-size: 10px; padding: 2px 7px; border-radius: 10px; }
   .sidebar-user { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.07); display: flex; align-items: center; gap: 10px; }
-  .user-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: white; flex-shrink: 0; }
+  .user-avatar { width: 34px; height: 34px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; color: white; flex-shrink: 0; overflow: hidden; }
   .user-name { font-size: 13px; color: white; font-weight: 500; }
   .user-role { font-size: 11px; color: rgba(255,255,255,0.4); }
 
@@ -98,7 +98,7 @@ body.index-body { background: var(--white); display: flex; flex-direction: colum
   .act-btn.approve { background: var(--teal-light); border-color: rgba(13,155,118,0.2); color: var(--teal); }
   .act-btn.danger { background: #fee2e2; border-color: rgba(239,68,68,0.2); color: var(--red); }
   .doc-cell { display: flex; align-items: center; gap: 8px; }
-  .mini-avatar { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: white; flex-shrink: 0; }
+  .mini-avatar { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: white; flex-shrink: 0; overflow: hidden; }
   .pagination-row { padding: 14px 20px; border-top: 1px solid var(--gray-100); display: flex; align-items: center; justify-content: space-between; font-size: 13px; color: var(--gray-500); }
   .page-btns { display: flex; gap: 4px; }
   .pb { width: 30px; height: 30px; border: 1px solid var(--gray-200); border-radius: 6px; background: white; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
@@ -196,7 +196,7 @@ body.index-body { background: var(--white); display: flex; flex-direction: colum
   .summary-card { background: white; border: 1px solid var(--gray-200); border-radius: 16px; padding: 20px; position: sticky; top: 24px; }
   .summary-title { font-size: 14px; font-weight: 600; color: var(--gray-900); margin-bottom: 16px; }
   .doc-mini { display: flex; gap: 12px; align-items: center; padding: 12px; background: var(--gray-50); border-radius: 10px; margin-bottom: 16px; }
-  .doc-mini-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600; color: white; flex-shrink: 0; }
+  .doc-mini-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600; color: white; flex-shrink: 0; overflow: hidden; }
   .doc-mini-name { font-size: 14px; font-weight: 500; }
   .doc-mini-spec { font-size: 12px; color: var(--teal); }
   .booking-detail { display: flex; justify-content: space-between; font-size: 13px; padding: 8px 0; border-bottom: 1px solid var(--gray-100); }
@@ -229,7 +229,7 @@ body.index-body { background: var(--white); display: flex; flex-direction: colum
   .profile-banner { height: 120px; background: linear-gradient(135deg, #0A1628, #0D4A38); position: relative; }
   .profile-banner-content { padding: 0 28px; position: relative; }
   .avatar-wrap { display: flex; align-items: flex-end; gap: 20px; transform: translateY(-40px); }
-  .doc-avatar-lg { width: 88px; height: 88px; border-radius: 50%; background: var(--teal); border: 4px solid white; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 700; color: white; flex-shrink: 0; }
+  .doc-avatar-lg { width: 88px; height: 88px; border-radius: 50%; background: var(--teal); border: 4px solid white; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 700; color: white; flex-shrink: 0; overflow: hidden; }
   .avatar-info { padding-bottom: 8px; }
   .doc-name-lg { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--navy); }
   .doc-spec-lg { font-size: 14px; color: var(--teal); font-weight: 500; margin: 3px 0; }

@@ -99,8 +99,10 @@
         <div class="filter-option"><div class="checkbox-wrapper"><input type="checkbox" id="e3" class="exp-filter" value="10+"><label for="e3">10+ years</label></div></div>
       </div>
     </div>
-    <button class="apply-filters">Apply Filters</button>
-    <button class="clear-filters">Clear All</button>
+    <div style="display: flex; gap: 10px; margin-top: 20px;">
+      <button class="apply-filters" style="flex: 1; padding: 12px; background: var(--teal); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Apply Filters</button>
+      <button class="clear-filters" style="flex: 1; padding: 12px; background: white; color: var(--gray-700); border: 1px solid var(--gray-300); border-radius: 8px; font-weight: 600; cursor: pointer;">Clear All</button>
+    </div>
   </aside>
 
   <!-- RESULTS -->
@@ -115,10 +117,7 @@
         <option>Availability: Soonest</option>
       </select>
     </div>
-    <div class="active-filters" id="activeFiltersContainer"></div>
-      <div class="filter-tag">Available Today <button>×</button></div>
-      <div class="filter-tag">5–10 yrs exp <button>×</button></div>
-    </div>
+    <div class="active-filters" id="activeFiltersContainer" style="min-height: 40px;"></div>
 
     <div class="doctors-list" id="dynamic-doctors-list">
       <div style="padding:40px;text-align:center;color:var(--gray-500);">Loading doctors...</div>

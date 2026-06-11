@@ -447,7 +447,12 @@ body.index-body { background: var(--white); display: flex; flex-direction: colum
   .specialty-count { font-size: 11px; color: var(--gray-500); margin-top: 2px; }
 
   /* SPECIALTY SHOWCASE CONTAINER */
-  .specialty-showcase { width: 100%; overflow: hidden; padding-bottom: 60px; background: white; }
+  .specialty-showcase { width: 100%; overflow: hidden; padding-top: 80px; padding-bottom: 80px; background: white; }
+
+  /* SECTION DIVIDER */
+  .section-divider-container { display: flex; align-items: center; justify-content: center; margin-bottom: 40px; padding: 0 5%; max-width: 1400px; margin-left: auto; margin-right: auto; }
+  .section-divider-line { flex: 1; height: 1px; background: var(--gray-300); }
+  .section-divider-text { padding: 0 24px; font-size: 13px; font-weight: 600; color: var(--gray-600); letter-spacing: 0.1em; text-transform: uppercase; }
 
   /* SPECIALTY IMAGE GRID (NEW) */
   .specialty-image-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; padding: 0 16px; }

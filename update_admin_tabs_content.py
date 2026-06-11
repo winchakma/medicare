@@ -1,134 +1,116 @@
-document.addEventListener("DOMContentLoaded", async () => {
-  const token = localStorage.getItem('medicare_token');
-  const role = localStorage.getItem('medicare_role');
+import re
 
-  if (!token || role !== 'admin') {
-    window.location.href = 'index.html';
-    return;
-  }
+html_path = r"c:\Users\user\Desktop\doctor\frontend\admin.html"
+with open(html_path, "r", encoding="utf-8") as f:
+    html = f.read()
 
-  
-  // Tab Switching Logic
-  const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
-  const tabs = document.querySelectorAll('.admin-tab');
-  const topbarTitle = document.querySelector('.topbar-title');
+# Replace the content of the other tabs
+new_appointments_tab = """
+    <div id="tab-appointments" class="admin-tab" style="display:none;">
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">All Appointments</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Booking ID</th>
+              <th>Patient</th>
+              <th>Doctor</th>
+              <th>Specialty</th>
+              <th>Date & Time</th>
+              <th>Fee</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="all-appointments-list"><tr><td colspan="8" style="text-align:center;padding:20px;">Loading appointments...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+"""
 
-  navItems.forEach(item => {
-    item.style.cursor = 'pointer';
-    item.addEventListener('click', () => {
-      // Remove active class from all
-      navItems.forEach(n => n.classList.remove('active'));
-      tabs.forEach(t => t.style.display = 'none');
-      
-      // Add active to clicked
-      item.classList.add('active');
-      const tabId = item.getAttribute('data-tab');
-      if (tabId) {
-        const tabEl = document.getElementById('tab-' + tabId);
-        if (tabEl) tabEl.style.display = 'block';
-      }
-      
-      // Update Title
-      if (topbarTitle) {
-        topbarTitle.innerText = item.innerText.replace(/[📅👨‍⚕️🧑‍🤝‍🧑💰🧾⚙️🔔🤖📊]/g, '').trim();
-        if (tabId === 'dashboard') topbarTitle.innerText = 'Dashboard Overview';
-      }
-    });
-  });
+new_doctors_tab = """
+    <div id="tab-doctors" class="admin-tab" style="display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+        <h2 style="font-size:20px; font-weight:600; color:var(--navy);">Doctors Directory</h2>
+        <button class="add-btn">+ Add Doctor</button>
+      </div>
+      <div class="doctors-grid" id="admin-doctors-grid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+        <div style="padding:20px; text-align:center; grid-column: 1 / -1;">Loading doctors...</div>
+      </div>
+    </div>
+"""
 
-  // Set today's date in top bar
-  const dateDisplay = document.querySelector('.date-display');
-  if (dateDisplay) {
-    const today = new Date();
-    dateDisplay.innerText = today.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
-  }
+new_patients_tab = """
+    <div id="tab-patients" class="admin-tab" style="display:none;">
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">Registered Patients</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+              <th>Joined Date</th>
+            </tr>
+          </thead>
+          <tbody id="admin-patients-list"><tr><td colspan="5" style="text-align:center;padding:20px;">Loading patients...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+"""
 
-  try {
-    // 1. Fetch dashboard stats
-    const statsRes = await fetch(`${window.MEDICARE_API_URL}/api/admin/dashboard-stats`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (!statsRes.ok) throw new Error("Failed to load stats");
-    const stats = await statsRes.json();
+new_settings_tab = """
+    <div id="tab-settings" class="admin-tab" style="display:none;">
+      <div class="table-card" style="max-width: 600px; padding: 30px;">
+        <h2 style="font-size:20px; font-weight:600; color:var(--navy); margin-bottom: 20px;">Profile Settings</h2>
+        <form id="admin-settings-form" onsubmit="handleAdminSettings(event)">
+          <div style="margin-bottom: 20px;">
+            <label style="display:block; margin-bottom:8px; font-weight:500;">First Name</label>
+            <input type="text" id="admin-fname" class="search-input" style="width:100%; border:1px solid #E5E7EB;" required>
+          </div>
+          <div style="margin-bottom: 20px;">
+            <label style="display:block; margin-bottom:8px; font-weight:500;">Last Name</label>
+            <input type="text" id="admin-lname" class="search-input" style="width:100%; border:1px solid #E5E7EB;" required>
+          </div>
+          <button type="submit" class="submit-btn" style="width:auto; padding: 10px 24px;">Save Changes</button>
+          <div id="settings-msg" style="margin-top: 10px; font-size: 14px;"></div>
+        </form>
+      </div>
+    </div>
+"""
 
-    document.getElementById('stat-total-bookings').innerText = stats.total_bookings.toLocaleString();
-    document.getElementById('stat-total-revenue').innerText = '$' + stats.total_revenue.toLocaleString();
-    document.getElementById('stat-active-doctors').innerText = stats.active_doctors.toLocaleString();
-    document.getElementById('stat-total-patients').innerText = stats.total_patients.toLocaleString();
+# Replace the old tabs in HTML
+html = re.sub(r'<div id="tab-appointments".*?</div>\s*(?=<div id="tab-doctors")', new_appointments_tab, html, flags=re.DOTALL)
+html = re.sub(r'<div id="tab-doctors".*?</div>\s*(?=<div id="tab-patients")', new_doctors_tab, html, flags=re.DOTALL)
+html = re.sub(r'<div id="tab-patients".*?</div>\s*(?=<div id="tab-revenue")', new_patients_tab, html, flags=re.DOTALL)
+html = re.sub(r'<div id="tab-settings".*?</div>\s*(?=</div> <!-- END content -->)', new_settings_tab + '\n', html, flags=re.DOTALL)
 
-    // 2. Fetch appointments
-    const apptsRes = await fetch(`${window.MEDICARE_API_URL}/api/admin/appointments`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (!apptsRes.ok) throw new Error("Failed to load appointments");
-    const appts = await apptsRes.json();
+# Add recent activity container to dashboard
+recent_activity_new = """
+      <div class="bottom-card" style="max-height: 400px; overflow-y: auto;">
+        <div style="font-size:14px;font-weight:600;margin-bottom:16px">Recent Activity</div>
+        <div id="admin-recent-activity">Loading activity...</div>
+      </div>
+"""
+html = re.sub(r'<div class="bottom-card">\s*<div style="font-size:14px;font-weight:600;margin-bottom:16px">Recent Activity</div>.*?</div>', recent_activity_new, html, flags=re.DOTALL)
 
-    const tbody = document.getElementById('admin-appointments-list');
-    tbody.innerHTML = '';
-    appts.forEach(a => {
-      let statusClass = 'status-pending';
-      if (a.status === 'confirmed') statusClass = 'status-confirmed';
-      if (a.status === 'cancelled') statusClass = 'status-cancelled';
+with open(html_path, "w", encoding="utf-8") as f:
+    f.write(html)
 
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td style="font-weight:500;color:var(--navy)">${a.booking_id}</td>
-        <td>${a.patient_name}</td>
-        <td><div class="doc-cell"><div class="mini-avatar" style="background:#0D9B76">${a.doctor_initials}</div>${a.doctor_name}</div></td>
-        <td>${a.specialty}</td>
-        <td>${a.date} &middot; ${a.time_slot}</td>
-        <td style="font-weight:500">$${a.fee}</td>
-        <td><span class="status-badge ${statusClass}">${a.status}</span></td>
-        <td><div class="action-btns"><button class="act-btn">View</button></div></td>
-      `;
-      tbody.appendChild(tr);
-    });
+print("Updated admin HTML with real tab containers")
 
-    if (appts.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;">No recent appointments found.</td></tr>';
-    }
+# Now update admin.js
+js_path = r"c:\Users\user\Desktop\doctor\frontend\js\admin.js"
+with open(js_path, "r", encoding="utf-8") as f:
+    js = f.read()
 
-    const pag = document.getElementById('admin-appointments-pagination');
-    if (pag) {
-      pag.innerHTML = `<span>Showing ${appts.length} of ${stats.total_bookings} appointments</span>
-        <div class="page-btns">
-          <div class="pb active">1</div>
-          <div class="pb">2</div>
-          <div class="pb">3</div>
-          <div class="pb">›</div>
-        </div>`;
-    }
-
-    // 3. Fetch top doctors
-    const docsRes = await fetch(`${window.MEDICARE_API_URL}/api/admin/top-doctors`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    if (docsRes.ok) {
-      const topDocs = await docsRes.json();
-      const topDocsContainer = document.getElementById('top-doctors-list');
-      if (topDocsContainer) {
-        topDocsContainer.innerHTML = '<div style="font-size:14px;font-weight:600;margin-bottom:16px">Top Performing Doctors</div>';
-        
-        topDocs.forEach((d, i) => {
-          const colors = ['#0D9B76', '#185FA5', '#0F6E56', '#D85A30', '#7B1FA2'];
-          const color = colors[i % colors.length];
-          
-          topDocsContainer.innerHTML += `
-            <div class="doctor-row-item">
-              <div class="mini-avatar" style="background:${color};width:36px;height:36px;font-size:12px">${d.initials}</div>
-              <div class="dr-info"><div class="dr-name">${d.name}</div><div class="dr-spec">${d.specialty}</div></div>
-              <div><div class="dr-rating">★ ${d.rating}</div><div class="dr-bookings">${d.bookings} bookings</div></div>
-            </div>
-          `;
-        });
-
-        if (topDocs.length === 0) {
-          topDocsContainer.innerHTML += '<div style="padding:10px;text-align:center;color:#666;">No bookings yet.</div>';
-        }
-      }
-    }
-
-
+# Add the fetch logic for the new tabs
+new_js_logic = """
     // 4. Fetch all appointments
     try {
       const allApptsRes = await fetch(`${window.MEDICARE_API_URL}/api/admin/all-appointments`, {
@@ -255,13 +237,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       badge.innerText = stats.total_bookings;
       badge.style.display = 'inline-block';
     }
+"""
 
-  } catch (err) {
-    console.error(err);
-  }
-});
+js = js.replace('  } catch (err) {', new_js_logic + '\n  } catch (err) {')
 
-
+settings_fn = """
 async function handleAdminSettings(e) {
   e.preventDefault();
   const fname = document.getElementById('admin-fname').value;
@@ -292,3 +272,11 @@ async function handleAdminSettings(e) {
     msg.style.color = "red";
   }
 }
+"""
+
+js += "\n" + settings_fn
+
+with open(js_path, "w", encoding="utf-8") as f:
+    f.write(js)
+
+print("Updated admin.js")

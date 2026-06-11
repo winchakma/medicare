@@ -31,6 +31,10 @@ async def get_doctors():
     doctors = await User.find(User.role == "doctor").to_list()
     return doctors
 
+@router.get("/me")
+async def get_my_profile(current_user: User = Depends(get_current_user)):
+    return current_user
+
 from beanie import PydanticObjectId
 
 @router.get("/{doctor_id}")
@@ -43,9 +47,7 @@ async def get_doctor(doctor_id: str):
     except Exception:
         raise HTTPException(status_code=404, detail="Invalid doctor ID")
 
-@router.get("/me")
-async def get_my_profile(current_user: User = Depends(get_current_user)):
-    return current_user
+
 
 @router.put("/me")
 async def update_my_profile(profile: DoctorProfileUpdate, current_user: User = Depends(get_current_user)):

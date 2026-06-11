@@ -231,6 +231,15 @@
     <div id="tab-settings" class="admin-tab" style="display:none;">
       <div class="table-card" style="max-width: 600px; padding: 30px;">
         <h2 style="font-size:20px; font-weight:600; color:var(--navy); margin-bottom: 20px;">Profile Settings</h2>
+        <div style="margin-bottom:30px; display:flex; align-items:center; gap:20px;">
+          <div id="admin-settings-avatar-preview" class="user-avatar" style="width:80px; height:80px; font-size:24px; cursor:pointer;" onclick="document.getElementById('admin-avatar-input').click()"></div>
+          <div>
+            <div style="font-weight:600; margin-bottom:8px;">Profile Picture</div>
+            <div style="font-size:13px; color:var(--gray-500); margin-bottom:10px;">Click the avatar to upload a new image.</div>
+            <input type="file" id="admin-avatar-input" style="display:none;" accept="image/*" onchange="handleAdminAvatarUpload(event)">
+            <div id="avatar-msg" style="font-size:13px;"></div>
+          </div>
+        </div>
         <form id="admin-settings-form" onsubmit="handleAdminSettings(event)">
           <div style="margin-bottom: 20px;">
             <label style="display:block; margin-bottom:8px; font-weight:500;">First Name</label>
@@ -239,6 +248,10 @@
           <div style="margin-bottom: 20px;">
             <label style="display:block; margin-bottom:8px; font-weight:500;">Last Name</label>
             <input type="text" id="admin-lname" class="search-input" style="width:100%; border:1px solid #E5E7EB;" required>
+          </div>
+          <div style="margin-bottom: 20px;">
+            <label style="display:block; margin-bottom:8px; font-weight:500;">New Password <span style="font-size:12px; font-weight:normal; color:#6b7280;">(Leave blank to keep current)</span></label>
+            <input type="password" id="admin-password" class="search-input" style="width:100%; border:1px solid #E5E7EB;" placeholder="••••••••">
           </div>
           <button type="submit" class="submit-btn" style="width:auto; padding: 10px 24px;">Save Changes</button>
           <div id="settings-msg" style="margin-top: 10px; font-size: 14px;"></div>

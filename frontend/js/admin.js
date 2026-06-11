@@ -173,9 +173,9 @@ document.addEventListener("DOMContentLoaded", async () => {
           grid.innerHTML = '';
           docs.forEach(d => {
             grid.innerHTML += `
-              <div class="doctor-card" style="border:1px solid #E5E7EB; border-radius:12px; padding:20px; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.02);">
+              <div class="doctor-card" style="border:1px solid #E5E7EB; border-radius:12px; padding:20px; background:#fff; box-shadow:0 2px 8px rgba(0,0,0,0.02); cursor:pointer; transition:transform 0.2s;" onclick='openDoctorProfile(${JSON.stringify(d).replace(/'/g, "&#39;")})' onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform='translateY(0)'">
                 <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
-                  <div class="mini-avatar" style="width:50px; height:50px; font-size:16px; background:#185FA5;">${d.name.substring(4, 6).toUpperCase()}</div>
+                  ${d.avatar_url ? `<img src="${window.MEDICARE_API_URL}${d.avatar_url}" style="width:50px; height:50px; border-radius:50%; object-fit:cover;">` : `<div class="mini-avatar" style="width:50px; height:50px; font-size:16px; background:#185FA5;">${d.name.substring(4, 6).toUpperCase()}</div>`}
                   <div>
                     <h3 style="font-size:16px; font-weight:600; color:var(--navy); margin:0;">${d.name}</h3>
                     <div style="font-size:13px; color:var(--gray-500);">${d.specialty}</div>
@@ -186,7 +186,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                   <div><strong>Fee:</strong><br>$${d.fee}</div>
                 </div>
                 <div style="display:flex; gap:10px;">
-                  <button class="act-btn" style="flex:1;">Edit Profile</button>
+                  <button class="act-btn" style="flex:1;">View Profile</button>
                 </div>
               </div>
             `;
@@ -275,7 +275,7 @@ async function handleAdminSettings(e) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${localStorage.getItem('medicare_token')}`
       },
-      body: JSON.stringify({ first_name: fname, last_name: lname })
+      body: JSON.stringify({ first_name: fname, last_name: lname, password: document.getElementById('admin-password').value || undefined })
     });
     if (res.ok) {
       msg.innerText = "Profile updated successfully!";
@@ -292,3 +292,116 @@ async function handleAdminSettings(e) {
     msg.style.color = "red";
   }
 }
+
+
+window.openDoctorProfile = function(d) {
+  // Hide all tabs
+  document.querySelectorAll('.admin-tab').forEach(t => t.style.display = 'none');
+  // Remove active from navs
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  // Make doctor nav active
+  document.querySelector('[data-tab="doctors"]').classList.add('active');
+  
+  // Show profile tab
+  document.getElementById('tab-doctor-profile').style.display = 'block';
+  
+  // Populate
+  document.getElementById('dp-name').innerText = d.name;
+  document.getElementById('dp-specialty').innerText = d.specialty;
+  document.getElementById('dp-email').innerText = d.email;
+  document.getElementById('dp-phone').innerText = d.phone || 'N/A';
+  document.getElementById('dp-experience').innerText = d.experience + ' years';
+  document.getElementById('dp-fee').innerText = '$' + d.fee;
+  document.getElementById('dp-location').innerText = d.location || 'N/A';
+  document.getElementById('dp-bio').innerText = d.bio || 'No biography provided.';
+  
+  if (d.verified) {
+    document.getElementById('dp-verified').innerText = 'Verified';
+    document.getElementById('dp-verified').className = 'status-badge status-confirmed';
+  } else {
+    document.getElementById('dp-verified').innerText = 'Unverified';
+    document.getElementById('dp-verified').className = 'status-badge status-cancelled';
+  }
+  
+  const av = document.getElementById('dp-avatar');
+  const ini = document.getElementById('dp-initials');
+  if (d.avatar_url) {
+    av.src = window.MEDICARE_API_URL + d.avatar_url;
+    av.style.display = 'block';
+    ini.style.display = 'none';
+  } else {
+    av.style.display = 'none';
+    ini.style.display = 'flex';
+    ini.innerText = d.name.substring(4, 6).toUpperCase();
+  }
+}
+
+window.handleAdminAvatarUpload = async function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  
+  const msg = document.getElementById('avatar-msg');
+  msg.innerText = "Uploading...";
+  msg.style.color = "var(--gray-500)";
+  
+  const fd = new FormData();
+  fd.append("file", file);
+  
+  try {
+    const res = await fetch(`${window.MEDICARE_API_URL}/api/admin/upload-avatar`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('medicare_token')}`
+      },
+      body: fd
+    });
+    if (res.ok) {
+      const data = await res.json();
+      msg.innerText = "Avatar updated!";
+      msg.style.color = "green";
+      document.querySelector('.user-avatar').style.backgroundImage = `url('${window.MEDICARE_API_URL}${data.avatar_url}')`;
+      document.querySelector('.user-avatar').style.backgroundSize = 'cover';
+      document.querySelector('.user-avatar').innerText = '';
+      
+      const pv = document.getElementById('admin-settings-avatar-preview');
+      if(pv) {
+         pv.style.backgroundImage = `url('${window.MEDICARE_API_URL}${data.avatar_url}')`;
+         pv.style.backgroundSize = 'cover';
+         pv.innerText = '';
+      }
+    } else {
+      msg.innerText = "Upload failed.";
+      msg.style.color = "red";
+    }
+  } catch(err) {
+    msg.innerText = "Upload error.";
+    msg.style.color = "red";
+  }
+}
+
+// In the dashboard init, check if we need to show the avatar
+setTimeout(async () => {
+  const token = localStorage.getItem('medicare_token');
+  try {
+     const meRes = await fetch(`${window.MEDICARE_API_URL}/api/auth/me`, {
+       headers: { 'Authorization': `Bearer ${token}` }
+     });
+     if (meRes.ok) {
+        const me = await meRes.json();
+        const av = document.querySelector('.user-avatar');
+        const pv = document.getElementById('admin-settings-avatar-preview');
+        if (me.avatar_url) {
+           av.style.backgroundImage = `url('${window.MEDICARE_API_URL}${me.avatar_url}')`;
+           av.style.backgroundSize = 'cover';
+           av.innerText = '';
+           if(pv) {
+             pv.style.backgroundImage = `url('${window.MEDICARE_API_URL}${me.avatar_url}')`;
+             pv.style.backgroundSize = 'cover';
+             pv.innerText = '';
+           }
+        } else {
+           if(pv) pv.innerText = me.first_name[0] + me.last_name[0];
+        }
+     }
+  } catch(e) {}
+}, 500);

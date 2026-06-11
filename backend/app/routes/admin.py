@@ -140,7 +140,7 @@ async def get_doctors(current_user: User = Depends(get_current_user)):
     if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Not authorized")
     doctors = await User.find(User.role == "doctor").sort(-User.created_at).to_list()
-    return [{"id": str(d.id), "name": f"Dr. {d.first_name} {d.last_name}", "email": d.email, "specialty": d.specialty or "General", "experience": d.experience_years or 0, "fee": d.fee_per_visit or 0, "verified": d.is_verified, "created_at": d.created_at} for d in doctors]
+    return [{"id": str(d.id), "name": f"Dr. {d.first_name} {d.last_name}", "email": d.email, "specialty": d.specialty or "General", "experience": d.experience_years or 0, "fee": d.fee_per_visit or 0, "verified": d.is_verified, "created_at": d.created_at, "avatar_url": d.avatar_url, "bio": d.bio, "location": d.location, "phone": d.phone} for d in doctors]
 
 @router.get("/all-appointments")
 async def get_all_appointments(current_user: User = Depends(get_current_user)):
@@ -249,6 +249,7 @@ async def get_recent_activity(current_user: User = Depends(get_current_user)):
 class SettingsUpdate(BaseModel):
     first_name: str
     last_name: str
+    password: str = None
 
 @router.put("/settings")
 async def update_settings(data: SettingsUpdate, current_user: User = Depends(get_current_user)):
@@ -257,5 +258,28 @@ async def update_settings(data: SettingsUpdate, current_user: User = Depends(get
         
     current_user.first_name = data.first_name
     current_user.last_name = data.last_name
+    
+    if data.password:
+        from app.utils.auth import get_password_hash
+        current_user.password_hash = get_password_hash(data.password)
+        
     await current_user.save()
     return {"message": "Settings updated"}
+
+from fastapi import File, UploadFile
+import os
+import shutil
+
+@router.post("/upload-avatar")
+async def upload_admin_avatar(file: UploadFile = File(...), current_user: User = Depends(get_current_user)):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+        
+    os.makedirs("uploads/avatars", exist_ok=True)
+    file_path = f"uploads/avatars/{current_user.id}_{file.filename}"
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+        
+    current_user.avatar_url = f"/{file_path}"
+    await current_user.save()
+    return {"avatar_url": current_user.avatar_url}

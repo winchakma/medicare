@@ -5,98 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Book Appointment — MediCare</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --navy: #0A1628; --teal: #0D9B76; --teal-light: #E1F5EE; --white: #ffffff;
-    --gray-50: #F8F9FB; --gray-100: #EFF1F5; --gray-200: #D8DCE6;
-    --gray-500: #6B7280; --gray-700: #374151; --gray-900: #111827;
-    --amber: #EF9F27; --red: #EF4444;
-  }
-  body { font-family: 'Inter', sans-serif; color: var(--gray-900); background: var(--gray-50); }
-  a { text-decoration: none; color: inherit; }
-  nav { display: flex; align-items: center; justify-content: space-between; padding: 0 5%; height: 64px; border-bottom: 1px solid var(--gray-200); background: white; }
-  .logo { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--navy); }
-  .logo span { color: var(--teal); }
-
-  .progress-bar { background: white; border-bottom: 1px solid var(--gray-200); padding: 16px 5%; }
-  .steps { display: flex; align-items: center; gap: 0; max-width: 600px; margin: 0 auto; }
-  .step-item { display: flex; align-items: center; gap: 8px; flex: 1; }
-  .step-circle { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0; }
-  .step-circle.done { background: var(--teal); color: white; }
-  .step-circle.active { background: var(--navy); color: white; }
-  .step-circle.pending { background: var(--gray-100); color: var(--gray-500); }
-  .step-text { font-size: 12px; font-weight: 500; }
-  .step-text.active { color: var(--navy); }
-  .step-text.done { color: var(--teal); }
-  .step-text.pending { color: var(--gray-500); }
-  .step-line { flex: 1; height: 2px; background: var(--gray-200); margin: 0 8px; }
-  .step-line.done { background: var(--teal); }
-
-  .page-wrap { max-width: 1000px; margin: 0 auto; padding: 28px 5%; display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items: start; }
-
-  .form-card { background: white; border: 1px solid var(--gray-200); border-radius: 16px; padding: 28px; }
-  .form-title { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--navy); margin-bottom: 4px; }
-  .form-subtitle { font-size: 13px; color: var(--gray-500); margin-bottom: 24px; }
-
-  .form-section { margin-bottom: 28px; }
-  .form-section-title { font-size: 13px; font-weight: 600; color: var(--gray-900); text-transform: uppercase; letter-spacing: 0.05em; padding-bottom: 10px; border-bottom: 1px solid var(--gray-100); margin-bottom: 16px; }
-  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
-  .field-single { margin-bottom: 14px; }
-  .field-group { display: flex; flex-direction: column; gap: 5px; }
-  .field-group label { font-size: 12px; font-weight: 500; color: var(--gray-700); }
-  .field-group input, .field-group select, .field-group textarea {
-    padding: 10px 14px; border: 1px solid var(--gray-200); border-radius: 8px;
-    font-size: 14px; color: var(--gray-900); font-family: 'Inter', sans-serif;
-    outline: none; transition: border-color .2s; background: white;
-  }
-  .field-group input:focus, .field-group select:focus, .field-group textarea:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(13,155,118,0.08); }
-  .field-group textarea { resize: vertical; min-height: 90px; }
-  .required { color: var(--red); margin-left: 2px; }
-
-  /* SLOT PICKER */
-  .date-tabs { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 16px; }
-  .date-tab { flex-shrink: 0; padding: 10px 16px; border: 1px solid var(--gray-200); border-radius: 10px; font-size: 13px; cursor: pointer; background: white; text-align: center; }
-  .date-tab.active { background: var(--navy); color: white; border-color: var(--navy); }
-  .date-tab .dname { font-size: 10px; opacity: 0.7; display: block; }
-  .slots-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
-  .slot { padding: 9px; border: 1px solid var(--gray-200); border-radius: 8px; font-size: 12px; text-align: center; cursor: pointer; color: var(--gray-700); transition: all .15s; }
-  .slot:hover { border-color: var(--teal); color: var(--teal); }
-  .slot.selected { background: var(--teal); color: white; border-color: var(--teal); font-weight: 500; }
-  .slot.booked { background: var(--gray-100); color: var(--gray-300); cursor: not-allowed; }
-
-  /* PAYMENT */
-  .payment-methods { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
-  .pay-method { border: 1.5px solid var(--gray-200); border-radius: 10px; padding: 12px; text-align: center; cursor: pointer; transition: all .15s; }
-  .pay-method.active { border-color: var(--teal); background: var(--teal-light); }
-  .pay-method-icon { font-size: 22px; margin-bottom: 4px; }
-  .pay-method-name { font-size: 12px; font-weight: 500; color: var(--gray-700); }
-  .card-fields { background: var(--gray-50); border-radius: 10px; padding: 16px; margin-bottom: 16px; }
-
-  .submit-btn { width: 100%; padding: 14px; background: var(--teal); color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; transition: background .2s; }
-  .submit-btn:hover { background: #0b8a67; }
-  .secure-note { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 12px; color: var(--gray-500); margin-top: 10px; }
-
-  /* SUMMARY SIDEBAR */
-  .summary-card { background: white; border: 1px solid var(--gray-200); border-radius: 16px; padding: 20px; position: sticky; top: 24px; }
-  .summary-title { font-size: 14px; font-weight: 600; color: var(--gray-900); margin-bottom: 16px; }
-  .doc-mini { display: flex; gap: 12px; align-items: center; padding: 12px; background: var(--gray-50); border-radius: 10px; margin-bottom: 16px; }
-  .doc-mini-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 600; color: white; flex-shrink: 0; }
-  .doc-mini-name { font-size: 14px; font-weight: 500; }
-  .doc-mini-spec { font-size: 12px; color: var(--teal); }
-  .booking-detail { display: flex; justify-content: space-between; font-size: 13px; padding: 8px 0; border-bottom: 1px solid var(--gray-100); }
-  .booking-detail:last-of-type { border-bottom: none; }
-  .booking-detail-label { color: var(--gray-500); }
-  .booking-detail-value { font-weight: 500; color: var(--gray-900); }
-  .price-breakdown { margin-top: 16px; padding-top: 14px; border-top: 2px solid var(--gray-100); }
-  .price-row { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; }
-  .price-row.total { font-size: 15px; font-weight: 600; color: var(--navy); padding-top: 8px; border-top: 1px solid var(--gray-200); margin-top: 6px; }
-  .promo-input { display: flex; gap: 8px; margin-top: 12px; }
-  .promo-input input { flex: 1; padding: 8px 12px; border: 1px solid var(--gray-200); border-radius: 8px; font-size: 13px; outline: none; }
-  .promo-apply { padding: 8px 14px; background: var(--navy); color: white; border: none; border-radius: 8px; font-size: 12px; font-weight: 500; cursor: pointer; white-space: nowrap; }
-
-  @media(max-width:768px) { .page-wrap { grid-template-columns: 1fr; } .summary-card { position: static; } .field-row { grid-template-columns: 1fr; } .slots-grid { grid-template-columns: repeat(3,1fr); } .payment-methods { grid-template-columns: repeat(3,1fr); } }
-</style>
+<link rel="stylesheet" href="css/style.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
 
@@ -268,5 +178,6 @@
     });
   });
 </script>
+<script src="js/script.js"></script>
 </body>
 </html>

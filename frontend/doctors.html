@@ -5,82 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Find Doctors — MediCare</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-<style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --navy: #0A1628; --teal: #0D9B76; --teal-light: #E1F5EE; --white: #ffffff;
-    --gray-50: #F8F9FB; --gray-100: #EFF1F5; --gray-200: #D8DCE6;
-    --gray-500: #6B7280; --gray-700: #374151; --gray-900: #111827;
-    --amber: #EF9F27;
-  }
-  body { font-family: 'Inter', sans-serif; color: var(--gray-900); background: var(--gray-50); }
-  a { text-decoration: none; color: inherit; }
-  nav { display: flex; align-items: center; justify-content: space-between; padding: 0 5%; height: 64px; border-bottom: 1px solid var(--gray-200); background: white; position: sticky; top: 0; z-index: 100; }
-  .logo { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--navy); }
-  .logo span { color: var(--teal); }
-  .nav-links { display: flex; gap: 1.5rem; font-size: 14px; color: var(--gray-500); }
-  .nav-links a:hover { color: var(--teal); }
-  .btn-primary { padding: 8px 20px; border: none; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; background: var(--teal); color: white; }
-
-  .page-header { background: var(--navy); padding: 32px 5%; }
-  .page-header h1 { font-family: 'Playfair Display', serif; font-size: 28px; color: white; margin-bottom: 8px; }
-  .page-header p { color: rgba(255,255,255,0.55); font-size: 14px; }
-  .breadcrumb { display: flex; gap: 8px; font-size: 13px; color: rgba(255,255,255,0.4); margin-bottom: 12px; }
-  .breadcrumb a { color: #5DCAA5; }
-
-  .content-area { display: grid; grid-template-columns: 280px 1fr; gap: 24px; padding: 28px 5%; max-width: 1300px; margin: 0 auto; }
-
-  /* FILTERS */
-  .filters-panel { background: white; border: 1px solid var(--gray-200); border-radius: 12px; padding: 20px; height: fit-content; position: sticky; top: 84px; }
-  .filter-section { margin-bottom: 24px; }
-  .filter-section:last-child { margin-bottom: 0; }
-  .filter-title { font-size: 13px; font-weight: 600; color: var(--gray-900); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
-  .filter-option { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; cursor: pointer; }
-  .filter-option input { accent-color: var(--teal); width: 15px; height: 15px; }
-  .filter-option label { font-size: 13px; color: var(--gray-700); cursor: pointer; flex: 1; }
-  .filter-option .count { font-size: 12px; color: var(--gray-500); background: var(--gray-100); padding: 1px 7px; border-radius: 10px; }
-  .range-slider { width: 100%; accent-color: var(--teal); margin: 8px 0; }
-  .range-labels { display: flex; justify-content: space-between; font-size: 12px; color: var(--gray-500); }
-  .apply-filters { width: 100%; padding: 10px; background: var(--teal); color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 8px; }
-  .clear-filters { width: 100%; padding: 8px; background: transparent; color: var(--gray-500); border: 1px solid var(--gray-200); border-radius: 8px; font-size: 13px; cursor: pointer; margin-top: 8px; }
-
-  /* RESULTS */
-  .results-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
-  .results-count { font-size: 14px; color: var(--gray-500); }
-  .results-count strong { color: var(--gray-900); }
-  .sort-select { padding: 8px 12px; border: 1px solid var(--gray-200); border-radius: 8px; font-size: 13px; color: var(--gray-700); outline: none; background: white; }
-  .active-filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
-  .filter-tag { display: flex; align-items: center; gap: 5px; background: var(--teal-light); border: 1px solid rgba(13,155,118,0.2); border-radius: 20px; padding: 4px 12px; font-size: 12px; color: #0D9B76; font-weight: 500; }
-  .filter-tag button { background: none; border: none; cursor: pointer; color: #0D9B76; font-size: 14px; line-height: 1; }
-
-  .doctors-list { display: flex; flex-direction: column; gap: 16px; }
-  .doctor-row { background: white; border: 1px solid var(--gray-200); border-radius: 14px; padding: 20px; display: grid; grid-template-columns: 70px 1fr auto; gap: 16px; align-items: start; transition: all .2s; cursor: pointer; }
-  .doctor-row:hover { border-color: var(--teal); box-shadow: 0 4px 20px rgba(13,155,118,0.08); }
-  .doc-avatar { width: 70px; height: 70px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 600; color: white; flex-shrink: 0; }
-  .doc-name { font-size: 16px; font-weight: 600; color: var(--gray-900); margin-bottom: 3px; }
-  .doc-specialty { font-size: 13px; color: var(--teal); font-weight: 500; margin-bottom: 8px; }
-  .doc-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
-  .doc-tag { font-size: 11px; background: var(--gray-100); color: var(--gray-700); padding: 3px 10px; border-radius: 20px; }
-  .doc-stats { display: flex; gap: 16px; font-size: 12px; color: var(--gray-500); }
-  .doc-stats span { display: flex; align-items: center; gap: 4px; }
-  .rating-stars { color: var(--amber); }
-  .doc-right { text-align: right; display: flex; flex-direction: column; gap: 10px; align-items: flex-end; flex-shrink: 0; }
-  .avail-badge { font-size: 11px; padding: 4px 10px; border-radius: 20px; font-weight: 500; }
-  .avail-today { background: #dcfce7; color: #166534; }
-  .avail-tomorrow { background: #fef3c7; color: #92400e; }
-  .doc-fee { font-size: 20px; font-weight: 600; color: var(--navy); }
-  .doc-fee-label { font-size: 11px; color: var(--gray-500); margin-top: -2px; }
-  .book-btn { padding: 9px 20px; background: var(--teal); color: white; border: none; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; }
-  .book-btn:hover { background: #0b8a67; }
-  .save-btn { padding: 8px; background: transparent; border: 1px solid var(--gray-200); border-radius: 8px; cursor: pointer; font-size: 16px; }
-
-  .pagination { display: flex; gap: 8px; justify-content: center; margin-top: 32px; }
-  .page-btn { width: 36px; height: 36px; border-radius: 8px; border: 1px solid var(--gray-200); background: white; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--gray-700); }
-  .page-btn.active { background: var(--teal); color: white; border-color: var(--teal); }
-  .page-btn:hover:not(.active) { border-color: var(--teal); color: var(--teal); }
-
-  @media(max-width:768px) { .content-area { grid-template-columns: 1fr; } .filters-panel { position: static; } .nav-links { display:none; } .doctor-row { grid-template-columns: 56px 1fr; } .doc-right { display: none; } }
-</style>
+<link rel="stylesheet" href="css/style.css">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
 
@@ -281,5 +207,6 @@
   </main>
 </div>
 
+<script src="js/script.js"></script>
 </body>
 </html>

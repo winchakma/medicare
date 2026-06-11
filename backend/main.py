@@ -1,9 +1,15 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+import os
 from fastapi.middleware.cors import CORSMiddleware
 from app.database import init_db
 from app.routes import auth, doctors, admin
 
 app = FastAPI(title="MediCare API")
+
+os.makedirs("uploads/avatars", exist_ok=True)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
 
 app.add_middleware(
     CORSMiddleware,

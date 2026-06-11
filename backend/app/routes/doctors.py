@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, File, UploadFile
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, Dict, List
 from app.models.user import User
 from app.models.booking import Booking
 from app.utils.deps import get_current_user
@@ -50,6 +50,17 @@ async def update_my_profile(profile: DoctorProfileUpdate, current_user: User = D
     
     await current_user.save()
     return current_user
+
+class ScheduleUpdate(BaseModel):
+    schedule: Dict[str, List[Dict[str, str]]]
+
+@router.put("/schedule")
+async def update_schedule(data: ScheduleUpdate, current_user: User = Depends(get_current_user)):
+    if current_user.role != "doctor":
+        raise HTTPException(status_code=403, detail="Not authorized")
+    current_user.schedule = data.schedule
+    await current_user.save()
+    return {"message": "Schedule updated successfully"}
 
 @router.post("/upload-avatar")
 async def upload_avatar(file: UploadFile = File(...), current_user: User = Depends(get_current_user)):

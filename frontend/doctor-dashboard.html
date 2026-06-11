@@ -273,7 +273,17 @@
     <!-- OTHER TABS PLACEHOLDERS -->
     <div id="tab-appointments" class="tab-content" style="display:none;"><div class="table-card" style="padding:40px; text-align:center; color:var(--gray-500);">Appointments view coming soon.</div></div>
     <div id="tab-patients" class="tab-content" style="display:none;"><div class="table-card" style="padding:40px; text-align:center; color:var(--gray-500);">Patients list coming soon.</div></div>
-    <div id="tab-schedule" class="tab-content" style="display:none;"><div class="table-card" style="padding:40px; text-align:center; color:var(--gray-500);">Schedule manager coming soon.</div></div>
+    <div id="tab-schedule" class="tab-content" style="display:none;">
+      <div class="table-card" style="padding:24px; max-width:800px;">
+        <h3 style="margin-bottom:20px; color:var(--navy);">Weekly Schedule</h3>
+        <p style="font-size:14px; color:var(--gray-500); margin-bottom:24px;">Set your availability for appointments. Patients will only be able to book you during these hours.</p>
+        <form id="dr-schedule-form" onsubmit="saveSchedule(event)">
+          <div id="schedule-days-container"></div>
+          <button type="submit" class="submit-btn" style="width:100%; padding:14px; margin-top:20px;">Save Schedule</button>
+          <div id="sched-msg" style="margin-top:15px; font-size:13px; text-align:center;"></div>
+        </form>
+      </div>
+    </div>
     <div id="tab-earnings" class="tab-content" style="display:none;"><div class="table-card" style="padding:40px; text-align:center; color:var(--gray-500);">Detailed earnings report coming soon.</div></div>
     <div id="tab-support" class="tab-content" style="display:none;"><div class="table-card" style="padding:40px; text-align:center; color:var(--gray-500);">Support center coming soon.</div></div>
 
@@ -364,6 +374,21 @@ async function loadDoctorData() {
       document.getElementById('view-fee').innerText = data.fee_per_visit ? `$${data.fee_per_visit}` : 'Not set';
       document.getElementById('view-bio').innerText = data.bio || 'No professional bio provided.';
       document.getElementById('view-location').innerText = data.location || 'Not set';
+      
+      // Load Schedule Data
+      if(data.schedule) {
+          daysOfWeek.forEach(day => {
+              if(data.schedule[day] && data.schedule[day].length > 0) {
+                  const cb = document.getElementById(`avail-${day}`);
+                  if (cb) {
+                      cb.checked = true;
+                      toggleTimeInputs(day);
+                      document.getElementById(`start-${day}`).value = data.schedule[day][0].start;
+                      document.getElementById(`end-${day}`).value = data.schedule[day][0].end;
+                  }
+              }
+          });
+      }
       
       // Load dashboard stats
       loadDashboardStats(token);
@@ -510,13 +535,104 @@ function toggleProfileMode(mode) {
     }
 }
 
+const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+function renderScheduleForm() {
+    const container = document.getElementById('schedule-days-container');
+    if (!container) return;
+    container.innerHTML = '';
+    daysOfWeek.forEach(day => {
+        container.innerHTML += `
+        <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--gray-200);">
+            <div style="width:120px; font-weight:600; color:var(--navy);">${day}</div>
+            <div style="display:flex; align-items:center; gap:10px;">
+                <label style="font-size:13px; color:var(--gray-600); display:flex; align-items:center; gap:4px; cursor:pointer;">
+                    <input type="checkbox" id="avail-${day}" onchange="toggleTimeInputs('${day}')"> Available
+                </label>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; opacity:0.5; transition:opacity 0.2s;" id="times-${day}">
+                <input type="time" id="start-${day}" class="search-input" style="padding:6px; width:120px;" disabled>
+                <span style="color:var(--gray-500); font-size:14px;">to</span>
+                <input type="time" id="end-${day}" class="search-input" style="padding:6px; width:120px;" disabled>
+            </div>
+        </div>
+        `;
+    });
+}
+
+function toggleTimeInputs(day) {
+    const isChecked = document.getElementById(`avail-${day}`).checked;
+    const timeDiv = document.getElementById(`times-${day}`);
+    const startInput = document.getElementById(`start-${day}`);
+    const endInput = document.getElementById(`end-${day}`);
+    
+    if (isChecked) {
+        timeDiv.style.opacity = '1';
+        startInput.disabled = false;
+        endInput.disabled = false;
+        if (!startInput.value) startInput.value = '09:00';
+        if (!endInput.value) endInput.value = '17:00';
+    } else {
+        timeDiv.style.opacity = '0.5';
+        startInput.disabled = true;
+        endInput.disabled = true;
+        startInput.value = '';
+        endInput.value = '';
+    }
+}
+
+async function saveSchedule(e) {
+  e.preventDefault();
+  const token = localStorage.getItem('medicare_token');
+  const schedule = {};
+  
+  daysOfWeek.forEach(day => {
+      const isAvailable = document.getElementById(`avail-${day}`).checked;
+      if (isAvailable) {
+          const start = document.getElementById(`start-${day}`).value;
+          const end = document.getElementById(`end-${day}`).value;
+          schedule[day] = [{ start, end }];
+      } else {
+          schedule[day] = [];
+      }
+  });
+
+  const msg = document.getElementById('sched-msg');
+  msg.innerText = 'Saving...';
+  msg.style.color = 'var(--gray-500)';
+  
+  try {
+    const res = await fetch(`${window.MEDICARE_API_URL}/api/doctors/schedule`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ schedule })
+    });
+    if(res.ok) {
+      msg.innerText = 'Schedule updated successfully!';
+      msg.style.color = 'var(--teal)';
+    } else {
+      msg.innerText = 'Failed to update schedule.';
+      msg.style.color = 'var(--red)';
+    }
+  } catch(err) {
+    msg.innerText = err.message;
+    msg.style.color = 'var(--red)';
+  }
+}
+
 function logout() {
   localStorage.removeItem('medicare_token');
   localStorage.removeItem('medicare_role');
   window.location.href = 'index.html';
 }
 
-document.addEventListener('DOMContentLoaded', loadDoctorData);
+document.addEventListener('DOMContentLoaded', () => {
+    renderScheduleForm();
+    loadDoctorData();
+});
 </script>
 </body>
 </html>

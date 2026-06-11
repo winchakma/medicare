@@ -16,6 +16,7 @@ class User(Document):
     
     # Doctor Specific Fields
     specialty: Optional[str] = None
+    bio: Optional[str] = None
     experience_years: Optional[int] = None
     location: Optional[str] = None
     fee_per_visit: Optional[float] = None

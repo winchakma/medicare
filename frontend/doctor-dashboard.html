@@ -209,6 +209,10 @@
             </div>
           </div>
           <div style="margin-bottom:20px;">
+            <label style="font-size:12px; font-weight:600; color:var(--navy);">Professional Bio</label>
+            <textarea id="prof-bio" class="search-input" style="width:100%; margin-top:5px; height:100px; resize:vertical;" placeholder="Describe your expertise, achievements, and what patients should know..."></textarea>
+          </div>
+          <div style="margin-bottom:20px;">
             <label style="font-size:12px; font-weight:600; color:var(--navy);">Clinic Address</label>
             <input type="text" id="prof-location" class="search-input" style="width:100%; margin-top:5px;" placeholder="123 Health St, City...">
           </div>
@@ -301,6 +305,7 @@ async function loadDoctorData() {
       document.getElementById('prof-fname').value = data.first_name || '';
       document.getElementById('prof-lname').value = data.last_name || '';
       document.getElementById('prof-specialty').value = data.specialty || 'General';
+      document.getElementById('prof-bio').value = data.bio || '';
       document.getElementById('prof-exp').value = data.experience_years || '';
       document.getElementById('prof-location').value = data.location || '';
       document.getElementById('prof-fee').value = data.fee_per_visit || '';
@@ -400,6 +405,7 @@ async function saveDoctorProfile(e) {
     first_name: document.getElementById('prof-fname').value,
     last_name: document.getElementById('prof-lname').value,
     specialty: document.getElementById('prof-specialty').value,
+    bio: document.getElementById('prof-bio').value,
     experience_years: parseInt(document.getElementById('prof-exp').value) || 0,
     location: document.getElementById('prof-location').value,
     fee_per_visit: parseFloat(document.getElementById('prof-fee').value) || 0

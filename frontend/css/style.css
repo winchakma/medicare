@@ -309,7 +309,7 @@ body.index-body { background: var(--white); display: flex; flex-direction: colum
   .btn-primary { padding: 8px 20px; border: none; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; background: var(--teal); color: white; }
 
   .page-header { background: var(--navy); padding: 32px max(5%, calc((100vw - 1200px) / 2)); }
-  .page-header.modern-header { background: linear-gradient(135deg, rgba(15,32,39,0.85), rgba(32,58,67,0.85), rgba(44,83,100,0.85)), url('../image/doctorbg.jpg') center/cover no-repeat; padding: 50px max(2%, calc((100vw - 1600px) / 2)); position: relative; overflow: hidden; }
+  .page-header.modern-header { background: linear-gradient(135deg, rgba(15,32,39,0.5), rgba(32,58,67,0.5), rgba(44,83,100,0.5)), url('../image/doctorbg.jpg') center/cover no-repeat; padding: 80px max(2%, calc((100vw - 1600px) / 2)); position: relative; overflow: hidden; }
   .page-header.modern-header::before { content: ''; position: absolute; right: 0; top: 0; width: 400px; height: 400px; background: radial-gradient(circle, rgba(93,202,165,0.15) 0%, transparent 70%); transform: translate(30%, -30%); border-radius: 50%; }
   .page-header h1 { font-family: 'Playfair Display', serif; font-size: 32px; color: white; margin-bottom: 8px; }
   .page-header p { color: rgba(255,255,255,0.6); font-size: 15px; }

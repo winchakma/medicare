@@ -3,20 +3,18 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MediCare — Specialties</title>
+<title>Specialties — MediCare</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
-<!-- NAV -->
+<body class="index-body">
 <nav>
-  <div class="logo">Medi<span>Care</span></div>
+  <div class="logo"><a href="index.html" style="color:inherit; text-decoration:none;">Medi<span>Care</span></a></div>
   <div class="nav-links">
     <a href="doctors.html">Find Doctors</a>
-    <a href="#">Specialties</a>
-    <a href="#">Health Blog</a>
-    <a href="#">About Us</a>
+    <a href="specialties.html" style="color:var(--teal)">Specialties</a>
+    <a href="blog.html">Health Blog</a>
+    <a href="about.html">About Us</a>
   </div>
   <div class="nav-cta">
     <button class="btn-outline" onclick="location.href='login.html'">Sign In</button>
@@ -24,30 +22,24 @@
   </div>
 </nav>
 
-
-<div style="min-height: 70vh;">
-
 <section class="section">
   <div class="section-header" style="text-align:center; display:block;">
     <div class="section-eyebrow">Comprehensive Care</div>
-    <div class="section-title">All Medical Specialties</div>
+    <div class="section-title">Medical Specialties</div>
+    <p style="color:var(--gray-500); margin-top:10px;">Find top-rated doctors across all major medical fields.</p>
   </div>
-  <div class="specialties-grid" style="margin-top:40px;">
-    <div class="specialty-card"><img src="image/pexels-nuptune-7966285.jpg" style="width:100%; height:120px; object-fit:cover; border-radius:8px; margin-bottom:10px;"><div class="specialty-name">Cardiology</div></div>
-    <div class="specialty-card"><img src="image/pexels-rdne-6129676.jpg" style="width:100%; height:120px; object-fit:cover; border-radius:8px; margin-bottom:10px;"><div class="specialty-name">Neurology</div></div>
-    <div class="specialty-card"><img src="image/pexels-mikhail-nilov-8942636.jpg" style="width:100%; height:120px; object-fit:cover; border-radius:8px; margin-bottom:10px;"><div class="specialty-name">Dentistry</div></div>
-    <div class="specialty-card"><img src="image/pexels-pavel-danilyuk-7108238.jpg" style="width:100%; height:120px; object-fit:cover; border-radius:8px; margin-bottom:10px;"><div class="specialty-name">Pediatrics</div></div>
+  <div class="specialties-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+    <!-- Large specialty cards -->
+    <div class="specialty-card" onclick="location.href='doctors.html'" style="padding: 30px;"><div class="specialty-icon" style="background:#FFE4E1; width:60px; height:60px; font-size:28px;">❤️</div><div class="specialty-name" style="font-size:16px;">Cardiology</div><div class="specialty-count">48 doctors</div></div>
+    <div class="specialty-card" onclick="location.href='doctors.html'" style="padding: 30px;"><div class="specialty-icon" style="background:#E1F5EE; width:60px; height:60px; font-size:28px;">🧠</div><div class="specialty-name" style="font-size:16px;">Neurology</div><div class="specialty-count">32 doctors</div></div>
+    <div class="specialty-card" onclick="location.href='doctors.html'" style="padding: 30px;"><div class="specialty-icon" style="background:#FFF3E0; width:60px; height:60px; font-size:28px;">🦷</div><div class="specialty-name" style="font-size:16px;">Dentistry</div><div class="specialty-count">67 doctors</div></div>
+    <div class="specialty-card" onclick="location.href='doctors.html'" style="padding: 30px;"><div class="specialty-icon" style="background:#E3F2FD; width:60px; height:60px; font-size:28px;">👶</div><div class="specialty-name" style="font-size:16px;">Pediatrics</div><div class="specialty-count">41 doctors</div></div>
+    <div class="specialty-card" onclick="location.href='doctors.html'" style="padding: 30px;"><div class="specialty-icon" style="background:#F3E5F5; width:60px; height:60px; font-size:28px;">🦴</div><div class="specialty-name" style="font-size:16px;">Orthopedic</div><div class="specialty-count">29 doctors</div></div>
+    <div class="specialty-card" onclick="location.href='doctors.html'" style="padding: 30px;"><div class="specialty-icon" style="background:#E8F5E9; width:60px; height:60px; font-size:28px;">👁️</div><div class="specialty-name" style="font-size:16px;">Ophthalmology</div><div class="specialty-count">22 doctors</div></div>
+    <div class="specialty-card" onclick="location.href='doctors.html'" style="padding: 30px;"><div class="specialty-icon" style="background:#FFF8E1; width:60px; height:60px; font-size:28px;">🩺</div><div class="specialty-name" style="font-size:16px;">General</div><div class="specialty-count">95 doctors</div></div>
+    <div class="specialty-card" onclick="location.href='doctors.html'" style="padding: 30px;"><div class="specialty-icon" style="background:#FCE4EC; width:60px; height:60px; font-size:28px;">🧬</div><div class="specialty-name" style="font-size:16px;">Dermatology</div><div class="specialty-count">38 doctors</div></div>
   </div>
 </section>
-
-</div>
-<!-- FOOTER -->
-<footer>
-  <p>© 2026 MediCare. All rights reserved. &nbsp;|&nbsp; <a href="#">Privacy Policy</a> &nbsp;|&nbsp; <a href="#">Terms of Service</a></p>
-</footer>
-
-<script src="js/script.js"></script>
-
-<script src="js/script.js"></script>
+<footer><p>© 2026 MediCare. All rights reserved.</p></footer>
 </body>
 </html>

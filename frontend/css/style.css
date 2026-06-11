@@ -127,8 +127,12 @@ body.index-body { background: var(--white); display: flex; flex-direction: colum
   
   
   nav { display: flex; align-items: center; justify-content: space-between; padding: 0 max(5%, calc((100vw - 1200px) / 2)); height: 64px; border-bottom: 1px solid var(--gray-200); background: white; }
-  .logo { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--navy); }
+  .logo { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--navy); cursor: pointer; }
   .logo span { color: var(--teal); }
+  .nav-links { display: flex; gap: 32px; align-items: center; }
+  .nav-links a { text-decoration: none; color: var(--gray-700); font-weight: 500; font-size: 14px; transition: color 0.2s; }
+  .nav-links a:hover { color: var(--teal); }
+  .nav-cta { display: flex; gap: 12px; align-items: center; }
 
   .progress-bar { background: white; border-bottom: 1px solid var(--gray-200); padding: 16px max(5%, calc((100vw - 1200px) / 2)); }
   .steps { display: flex; align-items: center; gap: 0; max-width: 600px; margin: 0 auto; }

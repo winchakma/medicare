@@ -150,9 +150,18 @@ document.addEventListener("DOMContentLoaded", () => {
       `;
     });
   }
+
+  // Make all logos navigate back to the home page
+  const logos = document.querySelectorAll('.logo');
+  logos.forEach(logo => {
+    logo.style.cursor = 'pointer';
+    logo.addEventListener('click', () => {
+      window.location.href = 'index.html';
+    });
+  });
 });
 
 function logout() {
   localStorage.removeItem('medicare_token');
-  window.location.reload();
+  window.location.href = 'index.html';
 }

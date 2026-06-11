@@ -2,7 +2,7 @@
 document.addEventListener("DOMContentLoaded", () => {
   console.log("MediCare scripts loaded");
 });
-\n
+
 // --- AUTH MODAL LOGIC ---
 
 function openAuthModal(tab = 'login') {

@@ -82,8 +82,8 @@
     </div>
     <div class="filter-section">
       <div class="filter-title">Consultation Fee</div>
-      <input type="range" class="range-slider" min="50" max="3000" value="3000" id="feeRange" oninput="document.getElementById('feeVal').textContent='$'+this.value">
-      <div class="range-labels"><span>$50</span><span id="feeVal">Up to $3000</span><span>$3000</span></div>
+      <input type="range" class="range-slider" min="50" max="3000" value="3000" id="feeRange" oninput="document.getElementById('feeVal').textContent='Up to $'+this.value">
+      <div class="range-labels"><span>$50</span><span id="feeVal">Up to $3000</span></div>
     </div>
     <div style="display: flex; gap: 10px; margin-top: 20px;">
       <button class="apply-filters" style="flex: 1; padding: 12px; background: var(--teal); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Apply Filters</button>

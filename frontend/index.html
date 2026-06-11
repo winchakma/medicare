@@ -47,8 +47,14 @@
       </div>
     </div>
   </div>
-  <div class="hero-image">
-    <img src="image/pexels-gustavo-fring-7446987.jpg" alt="Hero" style="width:100%; max-width:460px; border-radius:16px 16px 0 0; object-fit:cover;">
+  <div class="hero-image hero-slider">
+    <div class="slides-container" id="heroSlides">
+      <img src="image/doctorhome1.jpg" alt="Doctor 1" class="slide">
+      <img src="image/doctorhome2.jpg" alt="Doctor 2" class="slide">
+      <img src="image/doctorhome3.jpg" alt="Doctor 3" class="slide">
+    </div>
+    <button class="slider-btn prev-btn" onclick="moveSlide(-1)">&#10094;</button>
+    <button class="slider-btn next-btn" onclick="moveSlide(1)">&#10095;</button>
   </div>
 </section>
 
@@ -270,5 +276,23 @@
     </div>
   </div>
 </div>
+<script>
+  let slideIndex = 0;
+  const slidesContainer = document.getElementById('heroSlides');
+  const totalSlides = document.querySelectorAll('#heroSlides .slide').length;
+
+  function updateSlider() {
+    slidesContainer.style.transform = `translateX(-${slideIndex * 100}%)`;
+  }
+
+  function moveSlide(step) {
+    slideIndex = (slideIndex + step + totalSlides) % totalSlides;
+    updateSlider();
+  }
+
+  setInterval(() => {
+    moveSlide(1);
+  }, 5000);
+</script>
 </body>
 </html>

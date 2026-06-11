@@ -55,28 +55,28 @@
     <div class="stats-grid">
       <div class="stat-card">
         <div class="stat-card-top">
-          <div><div class="stat-card-label">Total Bookings</div><div class="stat-card-value">1,284</div></div>
+          <div><div class="stat-card-label">Total Bookings</div><div class="stat-card-value" id="stat-total-bookings">...</div></div>
           <div class="stat-card-icon" style="background:#E1F5EE">📅</div>
         </div>
         <div class="stat-card-change change-up">↑ 12% vs last month</div>
       </div>
       <div class="stat-card">
         <div class="stat-card-top">
-          <div><div class="stat-card-label">Total Revenue</div><div class="stat-card-value">$98,400</div></div>
+          <div><div class="stat-card-label">Total Revenue</div><div class="stat-card-value" id="stat-total-revenue">...</div></div>
           <div class="stat-card-icon" style="background:#FFF3E0">💰</div>
         </div>
         <div class="stat-card-change change-up">↑ 18% vs last month</div>
       </div>
       <div class="stat-card">
         <div class="stat-card-top">
-          <div><div class="stat-card-label">Active Doctors</div><div class="stat-card-value">147</div></div>
+          <div><div class="stat-card-label">Active Doctors</div><div class="stat-card-value" id="stat-active-doctors">...</div></div>
           <div class="stat-card-icon" style="background:#E3F2FD">👨‍⚕️</div>
         </div>
         <div class="stat-card-change change-up">↑ 5 new this month</div>
       </div>
       <div class="stat-card">
         <div class="stat-card-top">
-          <div><div class="stat-card-label">Total Patients</div><div class="stat-card-value">8,932</div></div>
+          <div><div class="stat-card-label">Total Patients</div><div class="stat-card-value" id="stat-total-patients">...</div></div>
           <div class="stat-card-icon" style="background:#FCE4EC">🧑‍🤝‍🧑</div>
         </div>
         <div class="stat-card-change change-up">↑ 234 new this month</div>
@@ -143,94 +143,18 @@
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td style="font-weight:500;color:var(--navy)">#MC-2847</td>
-            <td>Aminul Islam</td>
-            <td><div class="doc-cell"><div class="mini-avatar" style="background:#0D9B76">SA</div>Dr. Sarah Miller</div></td>
-            <td>Cardiology</td>
-            <td>Jun 11 · 10:00 AM</td>
-            <td style="font-weight:500">$80</td>
-            <td><span class="status-badge status-confirmed">Confirmed</span></td>
-            <td><div class="action-btns"><button class="act-btn">View</button><button class="act-btn danger">Cancel</button></div></td>
-          </tr>
-          <tr>
-            <td style="font-weight:500;color:var(--navy)">#MC-2846</td>
-            <td>Fatema Begum</td>
-            <td><div class="doc-cell"><div class="mini-avatar" style="background:#185FA5">NI</div>Dr. Natalie Irons</div></td>
-            <td>Pediatrics</td>
-            <td>Jun 11 · 11:30 AM</td>
-            <td style="font-weight:500">$60</td>
-            <td><span class="status-badge status-pending">Pending</span></td>
-            <td><div class="action-btns"><button class="act-btn approve">Approve</button><button class="act-btn danger">Reject</button></div></td>
-          </tr>
-          <tr>
-            <td style="font-weight:500;color:var(--navy)">#MC-2845</td>
-            <td>Karim Hassan</td>
-            <td><div class="doc-cell"><div class="mini-avatar" style="background:#D85A30">RK</div>Dr. Richard Kane</div></td>
-            <td>Neurology</td>
-            <td>Jun 11 · 2:00 PM</td>
-            <td style="font-weight:500">$120</td>
-            <td><span class="status-badge status-confirmed">Confirmed</span></td>
-            <td><div class="action-btns"><button class="act-btn">View</button><button class="act-btn danger">Cancel</button></div></td>
-          </tr>
-          <tr>
-            <td style="font-weight:500;color:var(--navy)">#MC-2844</td>
-            <td>Rahela Akter</td>
-            <td><div class="doc-cell"><div class="mini-avatar" style="background:#0F6E56">FA</div>Dr. Fatema Akter</div></td>
-            <td>Dermatology</td>
-            <td>Jun 10 · 3:30 PM</td>
-            <td style="font-weight:500">$900</td>
-            <td><span class="status-badge status-confirmed">Confirmed</span></td>
-            <td><div class="action-btns"><button class="act-btn">View</button><button class="act-btn danger">Cancel</button></div></td>
-          </tr>
-          <tr>
-            <td style="font-weight:500;color:var(--navy)">#MC-2843</td>
-            <td>Jamal Uddin</td>
-            <td><div class="doc-cell"><div class="mini-avatar" style="background:#7B1FA2">MH</div>Dr. Matthew Hayes</div></td>
-            <td>Orthopedic</td>
-            <td>Jun 10 · 9:00 AM</td>
-            <td style="font-weight:500">$150</td>
-            <td><span class="status-badge status-cancelled">Cancelled</span></td>
-            <td><div class="action-btns"><button class="act-btn">View</button><button class="act-btn approve">Refund</button></div></td>
-          </tr>
-        </tbody>
+        <tbody id="admin-appointments-list"><tr><td colspan="8" style="text-align:center;padding:20px;">Loading appointments...</td></tr></tbody>
       </table>
-      <div class="pagination-row">
-        <span>Showing 5 of 1,284 appointments</span>
-        <div class="page-btns">
-          <div class="pb active">1</div>
-          <div class="pb">2</div>
-          <div class="pb">3</div>
-          <div class="pb">›</div>
-        </div>
+      <div class="pagination-row" id="admin-appointments-pagination"></div>
+    </div>
       </div>
     </div>
 
     <!-- BOTTOM ROW -->
     <div class="bottom-row">
-      <div class="bottom-card">
+      <div class="bottom-card" id="top-doctors-list">
         <div style="font-size:14px;font-weight:600;margin-bottom:16px">Top Performing Doctors</div>
-        <div class="doctor-row-item">
-          <div class="mini-avatar" style="background:#0D9B76;width:36px;height:36px;font-size:12px">SA</div>
-          <div class="dr-info"><div class="dr-name">Dr. Sarah Miller</div><div class="dr-spec">Cardiologist</div></div>
-          <div><div class="dr-rating">★ 4.9</div><div class="dr-bookings">312 bookings</div></div>
-        </div>
-        <div class="doctor-row-item">
-          <div class="mini-avatar" style="background:#185FA5;width:36px;height:36px;font-size:12px">NI</div>
-          <div class="dr-info"><div class="dr-name">Dr. Natalie Irons</div><div class="dr-spec">Pediatrician</div></div>
-          <div><div class="dr-rating">★ 5.0</div><div class="dr-bookings">421 bookings</div></div>
-        </div>
-        <div class="doctor-row-item">
-          <div class="mini-avatar" style="background:#0F6E56;width:36px;height:36px;font-size:12px">FA</div>
-          <div class="dr-info"><div class="dr-name">Dr. Fatema Akter</div><div class="dr-spec">Dermatologist</div></div>
-          <div><div class="dr-rating">★ 4.9</div><div class="dr-bookings">295 bookings</div></div>
-        </div>
-        <div class="doctor-row-item">
-          <div class="mini-avatar" style="background:#D85A30;width:36px;height:36px;font-size:12px">RK</div>
-          <div class="dr-info"><div class="dr-name">Dr. Richard Kane</div><div class="dr-spec">Neurologist</div></div>
-          <div><div class="dr-rating">★ 4.8</div><div class="dr-bookings">208 bookings</div></div>
-        </div>
+        <div style="padding:20px;text-align:center;">Loading...</div>
       </div>
       <div class="bottom-card">
         <div style="font-size:14px;font-weight:600;margin-bottom:16px">Recent Activity</div>
@@ -329,5 +253,6 @@
     </div>
   </div>
 </div>
+<script src="js/admin.js"></script>
 </body>
 </html>

@@ -1,10 +1,19 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, File, UploadFile
 from pydantic import BaseModel
 from typing import Optional
 from app.models.user import User
 from app.models.booking import Booking
 from app.utils.deps import get_current_user
 from datetime import datetime
+import os
+import cloudinary
+import cloudinary.uploader
+
+cloudinary.config(
+  cloud_name = os.getenv('CLOUDINARY_CLOUD_NAME'),
+  api_key = os.getenv('CLOUDINARY_API_KEY'),
+  api_secret = os.getenv('CLOUDINARY_API_SECRET')
+)
 
 router = APIRouter()
 
@@ -39,6 +48,26 @@ async def update_my_profile(profile: DoctorProfileUpdate, current_user: User = D
     
     await current_user.save()
     return current_user
+
+@router.post("/upload-avatar")
+async def upload_avatar(file: UploadFile = File(...), current_user: User = Depends(get_current_user)):
+    if current_user.role != "doctor":
+        raise HTTPException(status_code=403, detail="Not authorized")
+        
+    try:
+        # Read file contents
+        file_content = await file.read()
+        
+        # Upload to cloudinary
+        result = cloudinary.uploader.upload(file_content, folder="medicare/avatars")
+        
+        # Save URL to user
+        current_user.avatar_url = result.get("secure_url")
+        await current_user.save()
+        
+        return {"avatar_url": current_user.avatar_url}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @router.get("/dashboard-stats")
 async def get_dashboard_stats(current_user: User = Depends(get_current_user)):

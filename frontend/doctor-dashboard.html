@@ -168,6 +168,18 @@
       <div class="table-card" style="padding:24px; max-width:800px;">
         <h3 style="margin-bottom:20px; color:var(--navy);">Profile Settings</h3>
         <form id="dr-profile-form" onsubmit="saveDoctorProfile(event)">
+          <div style="display:flex; align-items:center; gap:20px; margin-bottom:24px;">
+            <div id="prof-avatar-preview" style="width:80px; height:80px; border-radius:50%; background:var(--teal); display:flex; align-items:center; justify-content:center; color:white; font-size:28px; font-weight:600; overflow:hidden; border:3px solid var(--teal-light);">
+              Dr
+            </div>
+            <div>
+              <label for="prof-avatar-upload" class="btn-outline" style="display:inline-block; cursor:pointer; margin-bottom:8px;">Upload New Picture</label>
+              <input type="file" id="prof-avatar-upload" accept="image/*" style="display:none;" onchange="uploadAvatar(event)">
+              <div style="font-size:12px; color:var(--gray-500);">Recommended: High-res square image (JPG or PNG).</div>
+              <div id="prof-upload-msg" style="font-size:12px; margin-top:4px; font-weight:500;"></div>
+            </div>
+          </div>
+
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
             <div>
               <label style="font-size:12px; font-weight:600; color:var(--navy);">First Name</label>
@@ -271,7 +283,20 @@ async function loadDoctorData() {
       
       let init = "Dr";
       if(data.first_name && data.last_name) init = data.first_name[0] + data.last_name[0];
-      document.getElementById('dr-avatar').innerText = init;
+      
+      const avatarEl = document.getElementById('dr-avatar');
+      const previewEl = document.getElementById('prof-avatar-preview');
+      
+      if(data.avatar_url) {
+        const imgHtml = `<img src="${data.avatar_url}" style="width:100%;height:100%;object-fit:cover;">`;
+        avatarEl.innerHTML = imgHtml;
+        previewEl.innerHTML = imgHtml;
+        avatarEl.style.background = 'transparent';
+        previewEl.style.background = 'transparent';
+      } else {
+        avatarEl.innerHTML = init;
+        previewEl.innerHTML = init;
+      }
       
       document.getElementById('prof-fname').value = data.first_name || '';
       document.getElementById('prof-lname').value = data.last_name || '';
@@ -284,6 +309,39 @@ async function loadDoctorData() {
       loadDashboardStats(token);
     }
   } catch(e) { console.error(e); }
+}
+
+async function uploadAvatar(e) {
+  const file = e.target.files[0];
+  if(!file) return;
+  
+  const token = localStorage.getItem('medicare_token');
+  const msgEl = document.getElementById('prof-upload-msg');
+  msgEl.innerText = 'Uploading...';
+  msgEl.style.color = 'var(--gray-500)';
+  
+  const formData = new FormData();
+  formData.append('file', file);
+  
+  try {
+    const res = await fetch(`${window.MEDICARE_API_URL}/api/doctors/upload-avatar`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+      body: formData
+    });
+    
+    if(res.ok) {
+      msgEl.innerText = 'Upload successful!';
+      msgEl.style.color = 'var(--teal)';
+      loadDoctorData(); // Refresh UI
+    } else {
+      msgEl.innerText = 'Upload failed.';
+      msgEl.style.color = 'var(--red)';
+    }
+  } catch(err) {
+    msgEl.innerText = 'Upload error.';
+    msgEl.style.color = 'var(--red)';
+  }
 }
 
 async function loadDashboardStats(token) {

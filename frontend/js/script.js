@@ -57,7 +57,7 @@ async function handleLogin(e) {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
     btn.disabled = true;
 
-    const res = await fetch(`${window.MEDICARE_API_URL || 'http://localhost:8000'}/api/auth/login', {
+    const res = await fetch(`${window.MEDICARE_API_URL || 'http://localhost:8000'}/api/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
@@ -103,7 +103,7 @@ async function handleRegister(e) {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
     btn.disabled = true;
 
-    const res = await fetch(`${window.MEDICARE_API_URL || 'http://localhost:8000'}/api/auth/register', {
+    const res = await fetch(`${window.MEDICARE_API_URL || 'http://localhost:8000'}/api/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

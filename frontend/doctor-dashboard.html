@@ -166,8 +166,47 @@
     <!-- PROFILE TAB -->
     <div id="tab-profile" class="tab-content" style="display:none;">
       <div class="table-card" style="padding:24px; max-width:800px;">
-        <h3 style="margin-bottom:20px; color:var(--navy);">Profile Settings</h3>
-        <form id="dr-profile-form" onsubmit="saveDoctorProfile(event)">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+          <h3 style="color:var(--navy); margin:0;">Profile Settings</h3>
+          <button id="btn-edit-profile" class="btn-outline" style="padding:6px 12px; font-size:12px;" onclick="toggleProfileMode('edit')">Edit Profile</button>
+        </div>
+
+        <!-- VIEW MODE -->
+        <div id="prof-view-mode">
+          <div style="display:flex; align-items:center; gap:20px; margin-bottom:24px;">
+            <div id="view-avatar" style="width:80px; height:80px; border-radius:50%; background:var(--teal); display:flex; align-items:center; justify-content:center; color:white; font-size:28px; font-weight:600; overflow:hidden; border:3px solid var(--teal-light);">
+              Dr
+            </div>
+            <div>
+              <div id="view-name" style="font-size:18px; font-weight:600; color:var(--navy);">Dr. Name</div>
+              <div id="view-specialty" style="font-size:14px; color:var(--gray-500); margin-top:4px;">Specialty</div>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; padding:16px; background:var(--gray-50); border-radius:8px;">
+            <div>
+              <div style="font-size:11px; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.5px;">Experience</div>
+              <div id="view-exp" style="font-size:14px; font-weight:500; color:var(--navy); margin-top:4px;">-</div>
+            </div>
+            <div>
+              <div style="font-size:11px; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.5px;">Consultation Fee</div>
+              <div id="view-fee" style="font-size:14px; font-weight:500; color:var(--navy); margin-top:4px;">-</div>
+            </div>
+          </div>
+
+          <div style="margin-bottom:20px; padding:16px; background:var(--gray-50); border-radius:8px;">
+            <div style="font-size:11px; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.5px;">Professional Bio</div>
+            <div id="view-bio" style="font-size:14px; color:var(--gray-700); margin-top:8px; line-height:1.5;">-</div>
+          </div>
+
+          <div style="padding:16px; background:var(--gray-50); border-radius:8px;">
+            <div style="font-size:11px; color:var(--gray-500); text-transform:uppercase; letter-spacing:0.5px;">Clinic Address</div>
+            <div id="view-location" style="font-size:14px; color:var(--gray-700); margin-top:8px;">-</div>
+          </div>
+        </div>
+
+        <!-- EDIT MODE -->
+        <form id="dr-profile-form" onsubmit="saveDoctorProfile(event)" style="display:none;">
           <div style="display:flex; align-items:center; gap:20px; margin-bottom:24px;">
             <div id="prof-avatar-preview" style="width:80px; height:80px; border-radius:50%; background:var(--teal); display:flex; align-items:center; justify-content:center; color:white; font-size:28px; font-weight:600; overflow:hidden; border:3px solid var(--teal-light);">
               Dr
@@ -222,7 +261,10 @@
               <input type="number" id="prof-fee" class="search-input" style="width:100%; margin-top:5px;">
             </div>
           </div>
-          <button type="submit" class="submit-btn" style="width:100%; padding:14px; margin-top:10px;">Save Profile Changes</button>
+          <div style="display:flex; gap:12px; margin-top:10px;">
+            <button type="button" class="btn-outline" style="padding:14px; flex:1;" onclick="toggleProfileMode('view')">Cancel</button>
+            <button type="submit" class="submit-btn" style="padding:14px; flex:2;">Save Profile Changes</button>
+          </div>
           <div id="prof-msg" style="margin-top:15px; font-size:13px; text-align:center;"></div>
         </form>
       </div>
@@ -290,18 +332,23 @@ async function loadDoctorData() {
       
       const avatarEl = document.getElementById('dr-avatar');
       const previewEl = document.getElementById('prof-avatar-preview');
+      const viewAvatarEl = document.getElementById('view-avatar');
       
       if(data.avatar_url) {
         const imgHtml = `<img src="${data.avatar_url}" style="width:100%;height:100%;object-fit:cover;">`;
         avatarEl.innerHTML = imgHtml;
         previewEl.innerHTML = imgHtml;
+        viewAvatarEl.innerHTML = imgHtml;
         avatarEl.style.background = 'transparent';
         previewEl.style.background = 'transparent';
+        viewAvatarEl.style.background = 'transparent';
       } else {
         avatarEl.innerHTML = init;
         previewEl.innerHTML = init;
+        viewAvatarEl.innerHTML = init;
       }
       
+      // Update form inputs
       document.getElementById('prof-fname').value = data.first_name || '';
       document.getElementById('prof-lname').value = data.last_name || '';
       document.getElementById('prof-specialty').value = data.specialty || 'General';
@@ -309,6 +356,14 @@ async function loadDoctorData() {
       document.getElementById('prof-exp').value = data.experience_years || '';
       document.getElementById('prof-location').value = data.location || '';
       document.getElementById('prof-fee').value = data.fee_per_visit || '';
+
+      // Update View Mode displays
+      document.getElementById('view-name').innerText = `Dr. ${data.first_name} ${data.last_name}`;
+      document.getElementById('view-specialty').innerText = data.specialty || 'General';
+      document.getElementById('view-exp').innerText = data.experience_years ? `${data.experience_years} Years` : 'Not set';
+      document.getElementById('view-fee').innerText = data.fee_per_visit ? `$${data.fee_per_visit}` : 'Not set';
+      document.getElementById('view-bio').innerText = data.bio || 'No professional bio provided.';
+      document.getElementById('view-location').innerText = data.location || 'Not set';
       
       // Load dashboard stats
       loadDashboardStats(token);
@@ -425,9 +480,10 @@ async function saveDoctorProfile(e) {
       body: JSON.stringify(payload)
     });
     if(res.ok) {
-      msg.innerText = 'Profile updated successfully!';
-      msg.style.color = 'var(--teal)';
-      loadDoctorData();
+      msg.innerText = '';
+      await loadDoctorData();
+      toggleProfileMode('view');
+      // Show temporary success toast if we had one, or just rely on view mode update
     } else {
       msg.innerText = 'Failed to update profile.';
       msg.style.color = 'var(--red)';
@@ -436,6 +492,22 @@ async function saveDoctorProfile(e) {
     msg.innerText = err.message;
     msg.style.color = 'var(--red)';
   }
+}
+
+function toggleProfileMode(mode) {
+    const viewMode = document.getElementById('prof-view-mode');
+    const editMode = document.getElementById('dr-profile-form');
+    const editBtn = document.getElementById('btn-edit-profile');
+    
+    if (mode === 'edit') {
+        viewMode.style.display = 'none';
+        editMode.style.display = 'block';
+        editBtn.style.display = 'none';
+    } else {
+        viewMode.style.display = 'block';
+        editMode.style.display = 'none';
+        editBtn.style.display = 'block';
+    }
 }
 
 function logout() {

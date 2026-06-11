@@ -7,6 +7,35 @@ document.addEventListener("DOMContentLoaded", async () => {
     return;
   }
 
+  
+  // Tab Switching Logic
+  const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
+  const tabs = document.querySelectorAll('.admin-tab');
+  const topbarTitle = document.querySelector('.topbar-title');
+
+  navItems.forEach(item => {
+    item.style.cursor = 'pointer';
+    item.addEventListener('click', () => {
+      // Remove active class from all
+      navItems.forEach(n => n.classList.remove('active'));
+      tabs.forEach(t => t.style.display = 'none');
+      
+      // Add active to clicked
+      item.classList.add('active');
+      const tabId = item.getAttribute('data-tab');
+      if (tabId) {
+        const tabEl = document.getElementById('tab-' + tabId);
+        if (tabEl) tabEl.style.display = 'block';
+      }
+      
+      // Update Title
+      if (topbarTitle) {
+        topbarTitle.innerText = item.innerText.replace(/[📅👨‍⚕️🧑‍🤝‍🧑💰🧾⚙️🔔🤖📊]/g, '').trim();
+        if (tabId === 'dashboard') topbarTitle.innerText = 'Dashboard Overview';
+      }
+    });
+  });
+
   // Set today's date in top bar
   const dateDisplay = document.querySelector('.date-display');
   if (dateDisplay) {

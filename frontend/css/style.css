@@ -492,20 +492,21 @@ body.index-body { background: var(--white); display: flex; flex-direction: colum
 .auth-modal-overlay {
   position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
   background: rgba(0, 0, 0, 0.85); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px);
-  z-index: 1000; display: flex; align-items: center; justify-content: center;
+  z-index: 1000;
   opacity: 0; pointer-events: none; transition: opacity 0.3s ease;
 }
 .auth-modal-overlay.active { opacity: 1; pointer-events: auto; }
 
 .auth-modal-container.dark-modal {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95);
   background: #0f0f11; border-radius: 12px; overflow: hidden;
   width: 90%; max-width: 460px; display: flex; flex-direction: column;
   box-shadow: 0 24px 60px rgba(0,0,0,0.8); border: 1px solid #222;
-  transform: translateY(30px) scale(0.95); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  position: relative;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 1001;
 }
 .auth-modal-overlay.active .auth-modal-container.dark-modal {
-  transform: translateY(0) scale(1);
+  transform: translate(-50%, -50%) scale(1);
 }
 
 .dark-modal .auth-modal-close {

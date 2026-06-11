@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Health Blog — MediCare</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=2">
+<link rel="stylesheet" href="css/style.css?v=3">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body class="index-body">
@@ -96,24 +96,24 @@
 
 <!-- AUTH MODAL -->
 <div id="auth-modal" class="auth-modal-overlay">
-  <div class="auth-modal-container dark-modal">
+  <div class="auth-modal-container medicare-modal">
     <button class="auth-modal-close" onclick="closeAuthModal()"><i class="fas fa-times"></i></button>
-    <div class="dark-modal-content">
-      <div class="dark-auth-tabs">
-        <button class="auth-tab dark-auth-tab active" onclick="switchAuthTab('login')">SIGN IN</button>
-        <button class="auth-tab dark-auth-tab" onclick="switchAuthTab('register')">REGISTER</button>
+    <div class="medicare-modal-content">
+      <div class="auth-tabs-container">
+        <button class="auth-tab active" onclick="switchAuthTab('login')">SIGN IN</button>
+        <button class="auth-tab" onclick="switchAuthTab('register')">REGISTER</button>
       </div>
       
       <!-- Login Form -->
       <form id="login-form" class="auth-form active" onsubmit="handleLogin(event)">
-        <h2 class="dark-modal-title">WELCOME <span class="text-yellow">BACK</span></h2>
-        <p class="dark-modal-subtitle">Enter your elite credentials to continue.</p>
+        <h2 class="modal-title">Welcome <span class="text-teal">Back</span></h2>
+        <p class="modal-subtitle">Enter your credentials to access your dashboard.</p>
         
-        <div class="dark-auth-field">
+        <div class="auth-field">
           <label>Email or Phone Number</label>
-          <input type="email" id="login-email" required placeholder="you@example.com or +880...">
+          <input type="email" id="login-email" required placeholder="you@example.com">
         </div>
-        <div class="dark-auth-field">
+        <div class="auth-field">
           <label>Password</label>
           <input type="password" id="login-password" required placeholder="••••••••">
           <i class="fas fa-eye password-toggle"></i>
@@ -123,43 +123,43 @@
           <a href="#">Forgot Password?</a>
         </div>
         
-        <button type="submit" class="dark-submit-btn">SIGN IN</button>
+        <button type="submit" class="submit-btn">SIGN IN</button>
         
-        <div class="dark-auth-footer">
-          Don't have an account? <span class="text-yellow" style="cursor:pointer;" onclick="switchAuthTab('register')">Join the Elite</span>
+        <div class="auth-footer">
+          Don't have an account? <span class="text-teal" style="cursor:pointer;" onclick="switchAuthTab('register')">Register now</span>
         </div>
         <div id="login-error" class="auth-error"></div>
       </form>
 
       <!-- Register Form -->
       <form id="register-form" class="auth-form" onsubmit="handleRegister(event)">
-        <h2 class="dark-modal-title">JOIN <span class="text-yellow">THE ELITE</span></h2>
-        <p class="dark-modal-subtitle">Create an account to book your appointments.</p>
+        <h2 class="modal-title">Join <span class="text-teal">MediCare</span></h2>
+        <p class="modal-subtitle">Create an account to book your appointments.</p>
         
-        <div class="dark-auth-row">
-          <div class="dark-auth-field">
+        <div class="auth-row">
+          <div class="auth-field">
             <label>First Name</label>
             <input type="text" id="register-fname" required placeholder="First">
           </div>
-          <div class="dark-auth-field">
+          <div class="auth-field">
             <label>Last Name</label>
             <input type="text" id="register-lname" required placeholder="Last">
           </div>
         </div>
         
-        <div class="dark-auth-field">
+        <div class="auth-field">
           <label>Email Address</label>
           <input type="email" id="register-email" required placeholder="you@example.com">
         </div>
-        <div class="dark-auth-field">
+        <div class="auth-field">
           <label>Password</label>
           <input type="password" id="register-password" required placeholder="••••••••">
         </div>
         
-        <button type="submit" class="dark-submit-btn">REGISTER</button>
+        <button type="submit" class="submit-btn">REGISTER</button>
         
-        <div class="dark-auth-footer">
-          Already have an account? <span class="text-yellow" style="cursor:pointer;" onclick="switchAuthTab('login')">Sign In</span>
+        <div class="auth-footer">
+          Already have an account? <span class="text-teal" style="cursor:pointer;" onclick="switchAuthTab('login')">Sign In</span>
         </div>
         <div id="register-error" class="auth-error"></div>
         <div id="register-success" class="auth-success"></div>

@@ -43,6 +43,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     dateDisplay.innerText = today.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
   }
 
+  (async () => {
   try {
     // 1. Fetch dashboard stats
     const statsRes = await fetch(`${window.MEDICARE_API_URL}/api/admin/dashboard-stats`, {
@@ -56,6 +57,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById('stat-active-doctors').innerText = stats.active_doctors.toLocaleString();
     document.getElementById('stat-total-patients').innerText = stats.total_patients.toLocaleString();
 
+    } catch(e) {} })();
+
+(async () => {
+  try {
     // 2. Fetch appointments
     const apptsRes = await fetch(`${window.MEDICARE_API_URL}/api/admin/appointments`, {
       headers: { 'Authorization': `Bearer ${token}` }
@@ -99,6 +104,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         </div>`;
     }
 
+    } catch(e) {} })();
+
+(async () => {
+  try {
     // 3. Fetch top doctors
     const docsRes = await fetch(`${window.MEDICARE_API_URL}/api/admin/top-doctors`, {
       headers: { 'Authorization': `Bearer ${token}` }
@@ -129,6 +138,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
 
+    } catch(e) {} })();
+
+(async () => {
+  try {
     // 4. Fetch all appointments
     try {
       const allApptsRes = await fetch(`${window.MEDICARE_API_URL}/api/admin/all-appointments`, {
@@ -161,6 +174,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     } catch(e) {}
 
+    } catch(e) {} })();
+
+(async () => {
+  try {
     // 5. Fetch Doctors
     try {
       const docsRes = await fetch(`${window.MEDICARE_API_URL}/api/admin/doctors`, {
@@ -196,6 +213,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     } catch(e) {}
 
+    } catch(e) {} })();
+
+(async () => {
+  try {
     // 6. Fetch Patients
     try {
       const patRes = await fetch(`${window.MEDICARE_API_URL}/api/admin/patients`, {
@@ -223,6 +244,10 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     } catch(e) {}
 
+    } catch(e) {} })();
+
+(async () => {
+  try {
     // 7. Fetch Recent Activity
     try {
       const actRes = await fetch(`${window.MEDICARE_API_URL}/api/admin/recent-activity`, {
@@ -368,12 +393,14 @@ window.handleAdminAvatarUpload = async function(e) {
       msg.style.color = "green";
       document.querySelector('.user-avatar').style.backgroundImage = `url('${window.MEDICARE_API_URL}${data.avatar_url}')`;
       document.querySelector('.user-avatar').style.backgroundSize = 'cover';
+      document.querySelector('.user-avatar').style.backgroundPosition = 'center';
       document.querySelector('.user-avatar').innerText = '';
       
       const pv = document.getElementById('admin-settings-avatar-preview');
       if(pv) {
          pv.style.backgroundImage = `url('${window.MEDICARE_API_URL}${data.avatar_url}')`;
          pv.style.backgroundSize = 'cover';
+         pv.style.backgroundPosition = 'center';
          pv.innerText = '';
       }
     } else {
@@ -400,10 +427,12 @@ setTimeout(async () => {
         if (me.avatar_url) {
            av.style.backgroundImage = `url('${window.MEDICARE_API_URL}${me.avatar_url}')`;
            av.style.backgroundSize = 'cover';
+           av.style.backgroundPosition = 'center';
            av.innerText = '';
            if(pv) {
              pv.style.backgroundImage = `url('${window.MEDICARE_API_URL}${me.avatar_url}')`;
              pv.style.backgroundSize = 'cover';
+             pv.style.backgroundPosition = 'center';
              pv.innerText = '';
            }
         } else {

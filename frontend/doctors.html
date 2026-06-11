@@ -85,22 +85,6 @@
       <input type="range" class="range-slider" min="50" max="3000" value="3000" id="feeRange" oninput="document.getElementById('feeVal').textContent='$'+this.value">
       <div class="range-labels"><span>$50</span><span id="feeVal">Up to $3000</span><span>$3000</span></div>
     </div>
-    <div class="filter-section">
-      <div class="filter-title">Rating</div>
-      <div class="filter-options">
-        <div class="filter-option"><div class="checkbox-wrapper"><input type="radio" name="rating" id="r5" checked><label for="r5">★★★★★ 5.0 only</label></div></div>
-        <div class="filter-option"><div class="checkbox-wrapper"><input type="radio" name="rating" id="r4"><label for="r4">★★★★☆ 4.0 & above</label></div></div>
-        <div class="filter-option"><div class="checkbox-wrapper"><input type="radio" name="rating" id="r3"><label for="r3">★★★☆☆ 3.0 & above</label></div></div>
-      </div>
-    </div>
-    <div class="filter-section">
-      <div class="filter-title">Experience</div>
-      <div class="filter-options">
-        <div class="filter-option"><div class="checkbox-wrapper"><input type="checkbox" id="e1" class="exp-filter" value="0-5"><label for="e1">0–5 years</label></div></div>
-        <div class="filter-option"><div class="checkbox-wrapper"><input type="checkbox" id="e2" class="exp-filter" value="5-10"><label for="e2">5–10 years</label></div></div>
-        <div class="filter-option"><div class="checkbox-wrapper"><input type="checkbox" id="e3" class="exp-filter" value="10+"><label for="e3">10+ years</label></div></div>
-      </div>
-    </div>
     <div style="display: flex; gap: 10px; margin-top: 20px;">
       <button class="apply-filters" style="flex: 1; padding: 12px; background: var(--teal); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;">Apply Filters</button>
       <button class="clear-filters" style="flex: 1; padding: 12px; background: white; color: var(--gray-700); border: 1px solid var(--gray-300); border-radius: 8px; font-weight: 600; cursor: pointer;">Clear All</button>
@@ -257,9 +241,7 @@
         <div class="card-body">
           <div class="doc-name">Dr. ${doc.first_name} ${doc.last_name}</div>
           <div class="doc-specialty">${doc.specialty || 'General Physician'}</div>
-          <div class="doc-exp">${doc.experience_years || 0} yrs exp</div>
-          <div class="doc-stats-grid">
-            <div class="stat-item"><i class="fas fa-star" style="color:var(--amber)"></i> 5.0</div>
+          <div class="doc-stats-grid" style="grid-template-columns: 1fr;">
             <div class="stat-item"><i class="fas fa-map-marker-alt" style="color:var(--gray-400)"></i> ${doc.location || 'Online'}</div>
           </div>
         </div>

@@ -35,27 +35,27 @@
       <div class="filter-title">Specialty</div>
       <div class="filter-options">
         <div class="filter-option">
-          <div class="checkbox-wrapper"><input type="checkbox" id="s1" checked><label for="s1">Cardiologist</label></div>
+          <div class="checkbox-wrapper"><input type="checkbox" id="s1" class="specialty-filter" value="Cardiologist"><label for="s1">Cardiologist</label></div>
           <span class="count">48</span>
         </div>
         <div class="filter-option">
-          <div class="checkbox-wrapper"><input type="checkbox" id="s2"><label for="s2">Neurologist</label></div>
+          <div class="checkbox-wrapper"><input type="checkbox" id="s2" class="specialty-filter" value="Neurologist"><label for="s2">Neurologist</label></div>
           <span class="count">32</span>
         </div>
         <div class="filter-option">
-          <div class="checkbox-wrapper"><input type="checkbox" id="s3"><label for="s3">Pediatrician</label></div>
+          <div class="checkbox-wrapper"><input type="checkbox" id="s3" class="specialty-filter" value="Pediatrician"><label for="s3">Pediatrician</label></div>
           <span class="count">41</span>
         </div>
         <div class="filter-option">
-          <div class="checkbox-wrapper"><input type="checkbox" id="s4"><label for="s4">Dermatologist</label></div>
+          <div class="checkbox-wrapper"><input type="checkbox" id="s4" class="specialty-filter" value="Dermatologist"><label for="s4">Dermatologist</label></div>
           <span class="count">38</span>
         </div>
         <div class="filter-option">
-          <div class="checkbox-wrapper"><input type="checkbox" id="s5"><label for="s5">Dentist</label></div>
+          <div class="checkbox-wrapper"><input type="checkbox" id="s5" class="specialty-filter" value="Dentist"><label for="s5">Dentist</label></div>
           <span class="count">67</span>
         </div>
         <div class="filter-option">
-          <div class="checkbox-wrapper"><input type="checkbox" id="s6"><label for="s6">General Physician</label></div>
+          <div class="checkbox-wrapper"><input type="checkbox" id="s6" class="specialty-filter" value="General Physician"><label for="s6">General Physician</label></div>
           <span class="count">95</span>
         </div>
       </div>
@@ -65,7 +65,7 @@
       <div class="filter-title">Availability</div>
       <div class="filter-options">
         <div class="filter-option">
-          <div class="checkbox-wrapper"><input type="checkbox" id="a1" checked><label for="a1">Available Today</label></div>
+          <div class="checkbox-wrapper"><input type="checkbox" id="a1"><label for="a1">Available Today</label></div>
         </div>
         <div class="filter-option">
           <div class="checkbox-wrapper"><input type="checkbox" id="a2"><label for="a2">Tomorrow</label></div>
@@ -80,8 +80,8 @@
     </div>
     <div class="filter-section">
       <div class="filter-title">Consultation Fee</div>
-      <input type="range" class="range-slider" min="200" max="3000" value="1500" id="feeRange" oninput="document.getElementById('feeVal').textContent='$'+this.value">
-      <div class="range-labels"><span>$200</span><span id="feeVal">$1500</span><span>$3000</span></div>
+      <input type="range" class="range-slider" min="50" max="3000" value="3000" id="feeRange" oninput="document.getElementById('feeVal').textContent='$'+this.value">
+      <div class="range-labels"><span>$50</span><span id="feeVal">Up to $3000</span><span>$3000</span></div>
     </div>
     <div class="filter-section">
       <div class="filter-title">Rating</div>
@@ -94,9 +94,9 @@
     <div class="filter-section">
       <div class="filter-title">Experience</div>
       <div class="filter-options">
-        <div class="filter-option"><div class="checkbox-wrapper"><input type="checkbox" id="e1"><label for="e1">0–5 years</label></div></div>
-        <div class="filter-option"><div class="checkbox-wrapper"><input type="checkbox" id="e2" checked><label for="e2">5–10 years</label></div></div>
-        <div class="filter-option"><div class="checkbox-wrapper"><input type="checkbox" id="e3"><label for="e3">10+ years</label></div></div>
+        <div class="filter-option"><div class="checkbox-wrapper"><input type="checkbox" id="e1" class="exp-filter" value="0-5"><label for="e1">0–5 years</label></div></div>
+        <div class="filter-option"><div class="checkbox-wrapper"><input type="checkbox" id="e2" class="exp-filter" value="5-10"><label for="e2">5–10 years</label></div></div>
+        <div class="filter-option"><div class="checkbox-wrapper"><input type="checkbox" id="e3" class="exp-filter" value="10+"><label for="e3">10+ years</label></div></div>
       </div>
     </div>
     <button class="apply-filters">Apply Filters</button>
@@ -106,7 +106,7 @@
   <!-- RESULTS -->
   <main>
     <div class="results-header">
-      <div class="results-count">Showing <strong>247</strong> doctors</div>
+      <div class="results-count">Showing <strong id="doctorCount">0</strong> doctors</div>
       <select class="sort-select">
         <option>Sort: Most Relevant</option>
         <option>Rating: High to Low</option>
@@ -115,8 +115,7 @@
         <option>Availability: Soonest</option>
       </select>
     </div>
-    <div class="active-filters">
-      <div class="filter-tag">Cardiologist <button>×</button></div>
+    <div class="active-filters" id="activeFiltersContainer"></div>
       <div class="filter-tag">Available Today <button>×</button></div>
       <div class="filter-tag">5–10 yrs exp <button>×</button></div>
     </div>
@@ -125,7 +124,7 @@
       <div style="padding:40px;text-align:center;color:var(--gray-500);">Loading doctors...</div>
     </div>
     
-    <div class="pagination">
+    <div class="pagination" style="display: none;">
       <button class="page-btn">←</button>
       <button class="page-btn active">1</button>
       <button class="page-btn">2</button>
@@ -139,62 +138,142 @@
 </div>
 
 <script>
+  let allDoctors = [];
+
   document.addEventListener('DOMContentLoaded', async () => {
     try {
       const res = await fetch(`${window.MEDICARE_API_URL || 'http://localhost:8000'}/api/doctors/list`);
       if(res.ok) {
-        const doctors = await res.json();
-        const listEl = document.getElementById('dynamic-doctors-list');
-        listEl.innerHTML = '';
-        
-        if(doctors.length === 0) {
-          listEl.innerHTML = '<div style="padding:40px;text-align:center;color:var(--gray-500);">No verified doctors available yet.</div>';
-          return;
-        }
-
-        doctors.forEach(doc => {
-          let init = "Dr";
-          if(doc.first_name && doc.last_name) init = doc.first_name[0] + doc.last_name[0];
-          
-          let avatarHtml = `<div class="doc-avatar" style="background:var(--teal)">${init}</div>`;
-          if(doc.avatar_url) {
-            avatarHtml = `<div class="doc-avatar" style="background:transparent; overflow:hidden;"><img src="${doc.avatar_url}" style="width:100%;height:100%;object-fit:cover;"></div>`;
-          }
-
-          const html = `
-          <div class="doctor-card modern-grid-card" onclick="location.href='doctor-profile.html?id=${doc._id}'">
-            <div class="card-top-badges">
-              <div class="modern-badge badge-verified"><i class="fas fa-check-circle"></i></div>
-              <div class="modern-badge badge-available">Available</div>
-            </div>
-            <div class="card-avatar-wrap">
-              ${avatarHtml}
-            </div>
-            <div class="card-body">
-              <div class="doc-name">Dr. ${doc.first_name} ${doc.last_name}</div>
-              <div class="doc-specialty">${doc.specialty || 'General Physician'}</div>
-              <div class="doc-exp">${doc.experience_years || 0} yrs exp</div>
-              <div class="doc-stats-grid">
-                <div class="stat-item"><i class="fas fa-star" style="color:var(--amber)"></i> 5.0</div>
-                <div class="stat-item"><i class="fas fa-map-marker-alt" style="color:var(--gray-400)"></i> ${doc.location || 'Online'}</div>
-              </div>
-            </div>
-            <div class="card-footer">
-              <div class="card-price">
-                <div class="doc-fee">$${doc.fee_per_visit || 0}</div>
-                <div class="doc-fee-label">Consultation</div>
-              </div>
-              <button class="btn-modern-book" onclick="event.stopPropagation(); location.href='booking.html?id=${doc._id}'">Book Slot</button>
-            </div>
-          </div>
-          `;
-          listEl.innerHTML += html;
-        });
+        allDoctors = await res.json();
+        renderDoctors(allDoctors);
       }
     } catch(e) {
       console.error(e);
+      document.getElementById('dynamic-doctors-list').innerHTML = '<div style="padding:40px;text-align:center;color:red;">Failed to load doctors.</div>';
     }
+
+    // Attach event listeners to filter inputs
+    document.querySelectorAll('.filters-panel input').forEach(input => {
+      input.addEventListener('change', applyFilters);
+    });
+    
+    document.querySelector('.apply-filters').addEventListener('click', applyFilters);
+    document.querySelector('.clear-filters').addEventListener('click', () => {
+      document.querySelectorAll('.filters-panel input[type="checkbox"]').forEach(cb => cb.checked = false);
+      document.querySelectorAll('.filters-panel input[type="radio"]').forEach(rb => rb.checked = false);
+      const slider = document.getElementById('feeRange');
+      slider.value = 3000;
+      document.getElementById('feeVal').textContent = 'Up to $3000';
+      applyFilters();
+    });
   });
+
+  function applyFilters() {
+    let filtered = allDoctors;
+
+    // Specialty filter
+    const selectedSpecialties = Array.from(document.querySelectorAll('.specialty-filter:checked')).map(cb => cb.value.toLowerCase());
+    if (selectedSpecialties.length > 0) {
+      filtered = filtered.filter(doc => doc.specialty && selectedSpecialties.includes(doc.specialty.toLowerCase()));
+    }
+
+    // Experience filter
+    const expFilters = Array.from(document.querySelectorAll('.exp-filter:checked')).map(cb => cb.value);
+    if (expFilters.length > 0) {
+      filtered = filtered.filter(doc => {
+        const exp = doc.experience_years || 0;
+        return expFilters.some(range => {
+          if (range === '0-5') return exp >= 0 && exp <= 5;
+          if (range === '5-10') return exp > 5 && exp <= 10;
+          if (range === '10+') return exp > 10;
+          return false;
+        });
+      });
+    }
+
+    // Fee filter
+    const maxFee = parseInt(document.getElementById('feeRange').value);
+    filtered = filtered.filter(doc => (doc.fee_per_visit || 0) <= maxFee);
+    if (maxFee < 3000) {
+        document.getElementById('feeVal').textContent = `Up to $${maxFee}`;
+    } else {
+        document.getElementById('feeVal').textContent = 'Up to $3000';
+    }
+
+    // Render tags
+    renderTags();
+
+    // Render results
+    renderDoctors(filtered);
+  }
+
+  function renderTags() {
+    const container = document.getElementById('activeFiltersContainer');
+    container.innerHTML = '';
+    
+    document.querySelectorAll('.filters-panel input[type="checkbox"]:checked').forEach(cb => {
+      const label = cb.nextElementSibling.textContent;
+      const tag = document.createElement('div');
+      tag.className = 'filter-tag';
+      tag.innerHTML = `${label} <button onclick="removeFilter('${cb.id}')">×</button>`;
+      container.appendChild(tag);
+    });
+  }
+
+  window.removeFilter = function(id) {
+    document.getElementById(id).checked = false;
+    applyFilters();
+  };
+
+  function renderDoctors(doctors) {
+    const listEl = document.getElementById('dynamic-doctors-list');
+    document.getElementById('doctorCount').textContent = doctors.length;
+    listEl.innerHTML = '';
+    
+    if(doctors.length === 0) {
+      listEl.innerHTML = '<div style="padding:40px;text-align:center;color:var(--gray-500);grid-column: 1 / -1;">No doctors match your criteria.</div>';
+      return;
+    }
+
+    doctors.forEach(doc => {
+      let init = "Dr";
+      if(doc.first_name && doc.last_name) init = doc.first_name[0] + doc.last_name[0];
+      
+      let avatarHtml = `<div class="doc-avatar" style="background:var(--teal)">${init}</div>`;
+      if(doc.avatar_url) {
+        avatarHtml = `<div class="doc-avatar" style="background:transparent; overflow:hidden;"><img src="${doc.avatar_url}" style="width:100%;height:100%;object-fit:cover;"></div>`;
+      }
+
+      const html = `
+      <div class="doctor-card modern-grid-card" onclick="location.href='doctor-profile.html?id=${doc._id}'">
+        <div class="card-top-badges">
+          <div class="modern-badge badge-verified"><i class="fas fa-check-circle"></i></div>
+          <div class="modern-badge badge-available">Available</div>
+        </div>
+        <div class="card-avatar-wrap">
+          ${avatarHtml}
+        </div>
+        <div class="card-body">
+          <div class="doc-name">Dr. ${doc.first_name} ${doc.last_name}</div>
+          <div class="doc-specialty">${doc.specialty || 'General Physician'}</div>
+          <div class="doc-exp">${doc.experience_years || 0} yrs exp</div>
+          <div class="doc-stats-grid">
+            <div class="stat-item"><i class="fas fa-star" style="color:var(--amber)"></i> 5.0</div>
+            <div class="stat-item"><i class="fas fa-map-marker-alt" style="color:var(--gray-400)"></i> ${doc.location || 'Online'}</div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="card-price">
+            <div class="doc-fee">$${doc.fee_per_visit || 0}</div>
+            <div class="doc-fee-label">Consultation</div>
+          </div>
+          <button class="btn-modern-book" onclick="event.stopPropagation(); location.href='booking.html?id=${doc._id}'">Book Slot</button>
+        </div>
+      </div>
+      `;
+      listEl.innerHTML += html;
+    });
+  }
 </script>
 
 <footer class="rich-footer">

@@ -1,10 +1,14 @@
 from pymongo import MongoClient
 import os
+from dotenv import load_dotenv
 from app.utils.auth import get_password_hash
 
+load_dotenv()
+
 def main():
-    client = MongoClient(os.getenv("MONGODB_URI", "mongodb://localhost:27017"))
-    db = client[os.getenv("MONGODB_DB", "medicare_db")]
+    mongo_url = os.getenv("MONGODB_URL", "mongodb://localhost:27017")
+    client = MongoClient(mongo_url)
+    db = client["medicare_db"]
     collection = db["User"]
     
     email = "winchakma123@gmail.com"

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Doctor Dashboard — MediCare</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css?v=3">
+<link rel="stylesheet" href="css/style.css?v=4">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body class="admin-body">
@@ -18,12 +18,17 @@
   </div>
   <nav class="sidebar-nav">
     <div class="nav-section-label">Main</div>
-    <div class="nav-item active" onclick="switchTab('dashboard')"><span class="icon">📊</span> Dashboard</div>
+    <div class="nav-item active" onclick="switchTab('dashboard')"><span class="icon">📊</span> Overview</div>
     <div class="nav-item" onclick="switchTab('appointments')"><span class="icon">📅</span> Appointments <span class="badge" id="dr-appt-count">0</span></div>
-    <div class="nav-section-label">Settings</div>
-    <div class="nav-item" onclick="switchTab('profile')"><span class="icon">👨‍⚕️</span> My Profile</div>
-    <div class="nav-item" onclick="switchTab('availability')"><span class="icon">🕒</span> Availability</div>
-    <div class="nav-item" onclick="switchTab('finance')"><span class="icon">💰</span> Earnings</div>
+    <div class="nav-item" onclick="switchTab('patients')"><span class="icon">🧑‍🤝‍🧑</span> My Patients</div>
+    <div class="nav-item" onclick="switchTab('schedule')"><span class="icon">🕒</span> Schedule</div>
+    
+    <div class="nav-section-label">Finance</div>
+    <div class="nav-item" onclick="switchTab('earnings')"><span class="icon">💰</span> Earnings</div>
+    
+    <div class="nav-section-label">System</div>
+    <div class="nav-item" onclick="switchTab('profile')"><span class="icon">⚙️</span> Profile Settings</div>
+    <div class="nav-item" onclick="switchTab('support')"><span class="icon">🎧</span> Support</div>
   </nav>
   <div class="sidebar-user">
     <div class="user-avatar" id="dr-avatar">Dr</div>
@@ -49,25 +54,112 @@
     
     <!-- DASHBOARD TAB -->
     <div id="tab-dashboard" class="tab-content">
-      <div class="stats-grid">
+      <!-- STATS -->
+      <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
         <div class="stat-card">
           <div class="stat-card-top">
-            <div><div class="stat-card-label">Total Patients</div><div class="stat-card-value">124</div></div>
+            <div><div class="stat-card-label">Total Patients</div><div class="stat-card-value" id="stat-patients">0</div></div>
             <div class="stat-card-icon" style="background:#E1F5EE">🧑‍🤝‍🧑</div>
           </div>
+          <div class="stat-card-change change-up">↑ 12% vs last month</div>
         </div>
         <div class="stat-card">
           <div class="stat-card-top">
-            <div><div class="stat-card-label">Upcoming Appts</div><div class="stat-card-value">8</div></div>
+            <div><div class="stat-card-label">Upcoming Appts</div><div class="stat-card-value" id="stat-upcoming">0</div></div>
             <div class="stat-card-icon" style="background:#FFF3E0">📅</div>
           </div>
+          <div class="stat-card-change change-up">For this week</div>
         </div>
         <div class="stat-card">
           <div class="stat-card-top">
-            <div><div class="stat-card-label">Total Earnings</div><div class="stat-card-value">$4,200</div></div>
+            <div><div class="stat-card-label">Total Earnings</div><div class="stat-card-value" id="stat-earnings">$0</div></div>
             <div class="stat-card-icon" style="background:#E3F2FD">💰</div>
           </div>
+          <div class="stat-card-change change-up">↑ 18% vs last month</div>
         </div>
+      </div>
+
+      <!-- MIDDLE ROW -->
+      <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px;">
+        
+        <!-- UPCOMING APPOINTMENTS -->
+        <div class="table-card" style="margin-bottom: 0;">
+          <div class="table-header">
+            <div class="table-title">Upcoming Appointments</div>
+            <div class="table-actions">
+              <button class="filter-btn" onclick="switchTab('appointments')">View All</button>
+            </div>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Patient</th>
+                <th>Date & Time</th>
+                <th>Type</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="upcoming-list">
+              <tr><td colspan="4" style="text-align:center; color:var(--gray-500);">Loading...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- RECENT PATIENTS -->
+        <div class="bottom-card" style="margin-bottom: 0;">
+          <div style="font-size:14px;font-weight:600;margin-bottom:16px; color:var(--navy);">Recent Patients</div>
+          <div id="recent-patients-list">
+            <div style="text-align:center; color:var(--gray-500); font-size:13px;">Loading...</div>
+          </div>
+        </div>
+        
+      </div>
+
+      <!-- BOTTOM ROW -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px;">
+        
+        <!-- EARNINGS CHART -->
+        <div class="chart-card" style="grid-column: span 1;">
+          <div class="chart-card-title">Monthly Earnings</div>
+          <div class="chart-card-sub">Last 6 months revenue</div>
+          <div class="bar-chart">
+            <div class="bar-wrap"><div class="bar" style="height:40%;background:var(--teal);opacity:.5"></div><div class="bar-label">Jan</div></div>
+            <div class="bar-wrap"><div class="bar" style="height:60%;background:var(--teal);opacity:.6"></div><div class="bar-label">Feb</div></div>
+            <div class="bar-wrap"><div class="bar" style="height:45%;background:var(--teal);opacity:.7"></div><div class="bar-label">Mar</div></div>
+            <div class="bar-wrap"><div class="bar" style="height:70%;background:var(--teal);opacity:.8"></div><div class="bar-label">Apr</div></div>
+            <div class="bar-wrap"><div class="bar" style="height:65%;background:var(--teal);opacity:.9"></div><div class="bar-label">May</div></div>
+            <div class="bar-wrap"><div class="bar" style="height:90%;background:var(--teal)"></div><div class="bar-label">Jun</div></div>
+          </div>
+        </div>
+
+        <!-- TODAY'S SCHEDULE -->
+        <div class="bottom-card" style="grid-column: span 1;">
+          <div style="font-size:14px;font-weight:600;margin-bottom:16px; color:var(--navy);">Today's Schedule</div>
+          <div class="activity-item"><div class="activity-dot" style="background:var(--teal)"></div><div><div class="activity-text">09:00 AM - Morning Rounds</div></div></div>
+          <div class="activity-item"><div class="activity-dot" style="background:var(--amber)"></div><div><div class="activity-text">10:30 AM - Meeting with Patient</div></div></div>
+          <div class="activity-item"><div class="activity-dot" style="background:var(--red)"></div><div><div class="activity-text">01:00 PM - Lunch Break</div></div></div>
+          <div class="activity-item"><div class="activity-dot" style="background:var(--teal)"></div><div><div class="activity-text">02:00 PM - Afternoon Consultations</div></div></div>
+        </div>
+
+        <!-- QUICK ACTIONS & REVIEWS -->
+        <div style="display:flex; flex-direction:column; gap:24px;">
+            <div class="bottom-card">
+              <div style="font-size:14px;font-weight:600;margin-bottom:16px; color:var(--navy);">Quick Actions</div>
+              <button class="btn-outline" style="width:100%; margin-bottom:10px;" onclick="switchTab('schedule')">Set Availability</button>
+              <button class="btn-outline" style="width:100%; margin-bottom:10px;" onclick="switchTab('profile')">Update Profile</button>
+            </div>
+            
+            <div class="bottom-card" style="flex:1;">
+              <div style="font-size:14px;font-weight:600;margin-bottom:16px; color:var(--navy);">Recent Reviews</div>
+              <div style="font-size:13px; color:var(--gray-700); margin-bottom:12px;">
+                <span style="color:var(--amber)">★★★★★</span> "Very professional and caring doctor!" <br><span style="font-size:11px; color:var(--gray-500)">- Rahela A.</span>
+              </div>
+              <div style="font-size:13px; color:var(--gray-700);">
+                <span style="color:var(--amber)">★★★★☆</span> "Helped me understand my diagnosis clearly." <br><span style="font-size:11px; color:var(--gray-500)">- Karim H.</span>
+              </div>
+            </div>
+        </div>
+
       </div>
     </div>
 
@@ -78,47 +170,54 @@
         <form id="dr-profile-form" onsubmit="saveDoctorProfile(event)">
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
             <div>
-              <label style="font-size:12px; color:var(--gray-500);">First Name</label>
+              <label style="font-size:12px; font-weight:600; color:var(--navy);">First Name</label>
               <input type="text" id="prof-fname" class="search-input" style="width:100%; margin-top:5px;" required>
             </div>
             <div>
-              <label style="font-size:12px; color:var(--gray-500);">Last Name</label>
+              <label style="font-size:12px; font-weight:600; color:var(--navy);">Last Name</label>
               <input type="text" id="prof-lname" class="search-input" style="width:100%; margin-top:5px;" required>
             </div>
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
             <div>
-              <label style="font-size:12px; color:var(--gray-500);">Specialty</label>
+              <label style="font-size:12px; font-weight:600; color:var(--navy);">Specialty</label>
               <select id="prof-specialty" class="search-input" style="width:100%; margin-top:5px;">
-                <option>Cardiologist</option>
-                <option>Neurologist</option>
-                <option>Pediatrician</option>
-                <option>Orthopedic</option>
-                <option>Dermatologist</option>
-                <option>Dentist</option>
-                <option>General</option>
+                <option value="Cardiologist">Cardiologist</option>
+                <option value="Neurologist">Neurologist</option>
+                <option value="Pediatrician">Pediatrician</option>
+                <option value="Orthopedic">Orthopedic</option>
+                <option value="Dermatologist">Dermatologist</option>
+                <option value="Dentist">Dentist</option>
+                <option value="General">General</option>
               </select>
             </div>
             <div>
-              <label style="font-size:12px; color:var(--gray-500);">Experience (Years)</label>
+              <label style="font-size:12px; font-weight:600; color:var(--navy);">Experience (Years)</label>
               <input type="number" id="prof-exp" class="search-input" style="width:100%; margin-top:5px;">
             </div>
           </div>
           <div style="margin-bottom:20px;">
-            <label style="font-size:12px; color:var(--gray-500);">Clinic Address</label>
+            <label style="font-size:12px; font-weight:600; color:var(--navy);">Clinic Address</label>
             <input type="text" id="prof-location" class="search-input" style="width:100%; margin-top:5px;" placeholder="123 Health St, City...">
           </div>
           <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
             <div>
-              <label style="font-size:12px; color:var(--gray-500);">Consultation Fee ($)</label>
+              <label style="font-size:12px; font-weight:600; color:var(--navy);">Consultation Fee ($)</label>
               <input type="number" id="prof-fee" class="search-input" style="width:100%; margin-top:5px;">
             </div>
           </div>
-          <button type="submit" class="add-btn" style="width:100%; padding:12px;">Save Profile Changes</button>
+          <button type="submit" class="submit-btn" style="width:100%; padding:14px; margin-top:10px;">Save Profile Changes</button>
           <div id="prof-msg" style="margin-top:15px; font-size:13px; text-align:center;"></div>
         </form>
       </div>
     </div>
+    
+    <!-- OTHER TABS PLACEHOLDERS -->
+    <div id="tab-appointments" class="tab-content" style="display:none;"><div class="table-card" style="padding:40px; text-align:center; color:var(--gray-500);">Appointments view coming soon.</div></div>
+    <div id="tab-patients" class="tab-content" style="display:none;"><div class="table-card" style="padding:40px; text-align:center; color:var(--gray-500);">Patients list coming soon.</div></div>
+    <div id="tab-schedule" class="tab-content" style="display:none;"><div class="table-card" style="padding:40px; text-align:center; color:var(--gray-500);">Schedule manager coming soon.</div></div>
+    <div id="tab-earnings" class="tab-content" style="display:none;"><div class="table-card" style="padding:40px; text-align:center; color:var(--gray-500);">Detailed earnings report coming soon.</div></div>
+    <div id="tab-support" class="tab-content" style="display:none;"><div class="table-card" style="padding:40px; text-align:center; color:var(--gray-500);">Support center coming soon.</div></div>
 
   </div>
 </div>
@@ -127,10 +226,32 @@
 <script>
 function switchTab(tab) {
   document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
-  document.getElementById('tab-' + tab).style.display = 'block';
+  const targetTab = document.getElementById('tab-' + tab);
+  if(targetTab) targetTab.style.display = 'block';
+  
   document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  event.currentTarget.classList.add('active');
-  document.getElementById('topbar-title').innerText = tab.charAt(0).toUpperCase() + tab.slice(1);
+  
+  // Find the clicked nav item based on text or fallback if triggered by button
+  if(event && event.currentTarget && event.currentTarget.classList.contains('nav-item')) {
+      event.currentTarget.classList.add('active');
+  } else {
+      document.querySelectorAll('.nav-item').forEach(el => {
+          if(el.getAttribute('onclick') && el.getAttribute('onclick').includes(tab)) {
+              el.classList.add('active');
+          }
+      });
+  }
+  
+  const titleMap = {
+      'dashboard': 'Overview',
+      'appointments': 'Appointments',
+      'patients': 'My Patients',
+      'schedule': 'Schedule',
+      'earnings': 'Earnings',
+      'profile': 'Profile Settings',
+      'support': 'Support'
+  };
+  document.getElementById('topbar-title').innerText = titleMap[tab] || 'Overview';
 }
 
 document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-US', {weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'});
@@ -148,14 +269,70 @@ async function loadDoctorData() {
       document.getElementById('dr-name').innerText = `Dr. ${data.last_name}`;
       document.getElementById('dr-specialty').innerText = data.specialty || 'Doctor';
       
+      let init = "Dr";
+      if(data.first_name && data.last_name) init = data.first_name[0] + data.last_name[0];
+      document.getElementById('dr-avatar').innerText = init;
+      
       document.getElementById('prof-fname').value = data.first_name || '';
       document.getElementById('prof-lname').value = data.last_name || '';
       document.getElementById('prof-specialty').value = data.specialty || 'General';
       document.getElementById('prof-exp').value = data.experience_years || '';
       document.getElementById('prof-location').value = data.location || '';
       document.getElementById('prof-fee').value = data.fee_per_visit || '';
+      
+      // Load dashboard stats
+      loadDashboardStats(token);
     }
   } catch(e) { console.error(e); }
+}
+
+async function loadDashboardStats(token) {
+    try {
+        const res = await fetch(`${window.MEDICARE_API_URL}/api/doctors/dashboard-stats`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if(res.ok) {
+            const stats = await res.json();
+            document.getElementById('stat-patients').innerText = stats.total_patients;
+            document.getElementById('stat-upcoming').innerText = stats.upcoming_count;
+            document.getElementById('dr-appt-count').innerText = stats.upcoming_count;
+            document.getElementById('stat-earnings').innerText = '$' + stats.total_earnings.toLocaleString();
+            
+            // Populate upcoming appointments
+            const upcomingList = document.getElementById('upcoming-list');
+            if(stats.upcoming_appointments.length > 0) {
+                upcomingList.innerHTML = '';
+                stats.upcoming_appointments.forEach(b => {
+                    const statusBadge = `<span class="status-badge status-confirmed">Confirmed</span>`;
+                    upcomingList.innerHTML += `
+                    <tr>
+                      <td style="font-weight:500;">${b.patient_name}</td>
+                      <td>${b.date} · ${b.time_slot}</td>
+                      <td>${b.consultation_type === 'video' ? '📹 Video' : '🏥 In-person'}</td>
+                      <td><div class="action-btns"><button class="act-btn">View</button></div></td>
+                    </tr>`;
+                });
+            } else {
+                upcomingList.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--gray-500); padding:20px;">No upcoming appointments</td></tr>';
+            }
+            
+            // Populate recent patients
+            const recentList = document.getElementById('recent-patients-list');
+            if(stats.recent_patients.length > 0) {
+                recentList.innerHTML = '';
+                stats.recent_patients.forEach(p => {
+                    recentList.innerHTML += `
+                    <div class="doctor-row-item">
+                      <div class="mini-avatar" style="background:var(--teal);width:36px;height:36px;font-size:13px">${p.avatar}</div>
+                      <div class="dr-info"><div class="dr-name" style="font-size:14px">${p.name}</div><div class="dr-spec" style="font-size:12px">Patient</div></div>
+                      <div><button class="act-btn" style="background:var(--gray-50)">Profile</button></div>
+                    </div>`;
+                });
+            } else {
+                recentList.innerHTML = '<div style="text-align:center; color:var(--gray-500); font-size:13px; padding:20px;">No recent patients</div>';
+            }
+        }
+    } catch(e) { console.error(e); }
 }
 
 async function saveDoctorProfile(e) {

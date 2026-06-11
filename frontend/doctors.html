@@ -22,10 +22,10 @@
   <button class="btn-primary" onclick="openAuthModal('login')">Sign In</button>
 </nav>
 
-<div class="page-header">
+<div class="page-header modern-header">
   <div class="breadcrumb"><a href="index.html">Home</a> <span>›</span> <span>Find Doctors</span></div>
-  <h1>Find Your Doctor</h1>
-  <p>Browse 500+ verified specialists across Bangladesh</p>
+  <h1>Find Your <span style="color:var(--teal)">Specialist</span></h1>
+  <p>Browse 500+ verified professionals ready to help you across Bangladesh</p>
 </div>
 
 <div class="content-area">
@@ -116,22 +116,31 @@
           }
 
           const html = `
-          <div class="doctor-row" onclick="location.href='doctor-profile.html?id=${doc._id}'">
-            ${avatarHtml}
-            <div>
-              <div class="doc-name">Dr. ${doc.first_name} ${doc.last_name}</div>
-              <div class="doc-specialty">${doc.specialty || 'General Physician'} · ${doc.experience_years || 0} yrs exp</div>
-              <div class="doc-tags"><span class="doc-tag">Verified</span></div>
+          <div class="doctor-row modern-doctor-card" onclick="location.href='doctor-profile.html?id=${doc._id}'">
+            <div class="avatar-container">
+              ${avatarHtml}
+              <div class="verified-ring"></div>
+            </div>
+            <div class="doc-info-col">
+              <div class="doc-name-wrap">
+                <div class="doc-name">Dr. ${doc.first_name} ${doc.last_name}</div>
+                <div class="modern-badge badge-verified"><i class="fas fa-check-circle"></i> Verified</div>
+              </div>
+              <div class="doc-specialty">${doc.specialty || 'General Physician'} <span class="dot-sep">•</span> ${doc.experience_years || 0} yrs exp</div>
+              
               <div class="doc-stats">
-                <span>📍 ${doc.location || 'Online'}</span>
+                <span><i class="fas fa-star" style="color:var(--amber)"></i> 5.0</span>
+                <span><i class="fas fa-map-marker-alt" style="color:var(--gray-400)"></i> ${doc.location || 'Online'}</span>
               </div>
             </div>
-            <div class="doc-right">
-              <span class="avail-badge avail-today">Available</span>
-              <div><div class="doc-fee">$${doc.fee_per_visit || 0}</div><div class="doc-fee-label">per consultation</div></div>
-              <div style="display:flex;gap:8px">
-                <button class="book-btn" onclick="event.stopPropagation(); location.href='booking.html?id=${doc._id}'">Book Slot</button>
+            
+            <div class="doc-action-col">
+              <div class="modern-badge badge-available">Available Today</div>
+              <div class="price-wrap">
+                <div class="doc-fee">$${doc.fee_per_visit || 0}</div>
+                <div class="doc-fee-label">per consultation</div>
               </div>
+              <button class="btn-modern-book" onclick="event.stopPropagation(); location.href='booking.html?id=${doc._id}'">Book Slot</button>
             </div>
           </div>
           `;

@@ -27,35 +27,37 @@
 </nav>
 
 <!-- HERO -->
-<section class="hero">
-  <div class="hero-text">
-    <div class="hero-badge">500+ Verified Doctors Online</div>
-    <h1>Your Health,<br>Your <em>Doctor</em>,<br>Your Schedule.</h1>
-    <p>Book appointments with top-rated specialists in minutes. Real doctors, real care — available when you need them.</p>
-    <div class="hero-stats">
-      <div class="stat-item">
-        <div class="stat-num">500+</div>
-        <div class="stat-label">Verified Doctors</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">50K+</div>
-        <div class="stat-label">Patients Served</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-num">4.9★</div>
-        <div class="stat-label">Average Rating</div>
+<section class="hero" id="heroSection">
+  <div class="slides-container" id="heroSlides">
+    <div class="slide" style="background-image: url('image/doctorhome1.jpg')"></div>
+    <div class="slide" style="background-image: url('image/doctorhome2.jpg')"></div>
+    <div class="slide" style="background-image: url('image/doctorhome3.jpg')"></div>
+  </div>
+  
+  <div class="hero-overlay-content">
+    <div class="hero-text">
+      <div class="hero-badge">500+ Verified Doctors Online</div>
+      <h1>Your Health,<br>Your <em>Doctor</em>,<br>Your Schedule.</h1>
+      <p>Book appointments with top-rated specialists in minutes. Real doctors, real care — available when you need them.</p>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <div class="stat-num">500+</div>
+          <div class="stat-label">Verified Doctors</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">50K+</div>
+          <div class="stat-label">Patients Served</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">4.9★</div>
+          <div class="stat-label">Average Rating</div>
+        </div>
       </div>
     </div>
   </div>
-  <div class="hero-image hero-slider">
-    <div class="slides-container" id="heroSlides">
-      <img src="image/doctorhome1.jpg" alt="Doctor 1" class="slide">
-      <img src="image/doctorhome2.jpg" alt="Doctor 2" class="slide">
-      <img src="image/doctorhome3.jpg" alt="Doctor 3" class="slide">
-    </div>
-    <button class="slider-btn prev-btn" onclick="moveSlide(-1)">&#10094;</button>
-    <button class="slider-btn next-btn" onclick="moveSlide(1)">&#10095;</button>
-  </div>
+
+  <button class="slider-btn prev-btn" onclick="moveSlide(-1)">&#10094;</button>
+  <button class="slider-btn next-btn" onclick="moveSlide(1)">&#10095;</button>
 </section>
 
 <!-- SPECIALTIES SHOWCASE -->

@@ -44,3 +44,9 @@ async def login(user_data: LoginSchema):
         expires_delta=timedelta(days=7)
     )
     return {"access_token": access_token, "token_type": "bearer", "role": user.role}
+
+from app.utils.deps import get_current_user
+
+@router.get("/me")
+async def get_my_profile(current_user: User = Depends(get_current_user)):
+    return current_user

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doctor Dashboard — MediCare</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css?v=3">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="admin-body">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo">Medi<span>Care</span></div>
+    <div class="subtitle" style="color:var(--teal)">Doctor Portal</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <div class="nav-item active" onclick="switchTab('dashboard')"><span class="icon">📊</span> Dashboard</div>
+    <div class="nav-item" onclick="switchTab('appointments')"><span class="icon">📅</span> Appointments <span class="badge" id="dr-appt-count">0</span></div>
+    <div class="nav-section-label">Settings</div>
+    <div class="nav-item" onclick="switchTab('profile')"><span class="icon">👨‍⚕️</span> My Profile</div>
+    <div class="nav-item" onclick="switchTab('availability')"><span class="icon">🕒</span> Availability</div>
+    <div class="nav-item" onclick="switchTab('finance')"><span class="icon">💰</span> Earnings</div>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-avatar" id="dr-avatar">Dr</div>
+    <div>
+      <div class="user-name" id="dr-name">Loading...</div>
+      <div class="user-role" id="dr-specialty">Doctor</div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">Overview</div>
+    <div class="topbar-actions">
+      <div class="date-display" id="current-date"></div>
+      <div class="notif-btn">🔔<div class="notif-dot"></div></div>
+      <button class="add-btn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="content">
+    
+    <!-- DASHBOARD TAB -->
+    <div id="tab-dashboard" class="tab-content">
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <div><div class="stat-card-label">Total Patients</div><div class="stat-card-value">124</div></div>
+            <div class="stat-card-icon" style="background:#E1F5EE">🧑‍🤝‍🧑</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <div><div class="stat-card-label">Upcoming Appts</div><div class="stat-card-value">8</div></div>
+            <div class="stat-card-icon" style="background:#FFF3E0">📅</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-top">
+            <div><div class="stat-card-label">Total Earnings</div><div class="stat-card-value">$4,200</div></div>
+            <div class="stat-card-icon" style="background:#E3F2FD">💰</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROFILE TAB -->
+    <div id="tab-profile" class="tab-content" style="display:none;">
+      <div class="table-card" style="padding:24px; max-width:800px;">
+        <h3 style="margin-bottom:20px; color:var(--navy);">Profile Settings</h3>
+        <form id="dr-profile-form" onsubmit="saveDoctorProfile(event)">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
+            <div>
+              <label style="font-size:12px; color:var(--gray-500);">First Name</label>
+              <input type="text" id="prof-fname" class="search-input" style="width:100%; margin-top:5px;" required>
+            </div>
+            <div>
+              <label style="font-size:12px; color:var(--gray-500);">Last Name</label>
+              <input type="text" id="prof-lname" class="search-input" style="width:100%; margin-top:5px;" required>
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
+            <div>
+              <label style="font-size:12px; color:var(--gray-500);">Specialty</label>
+              <select id="prof-specialty" class="search-input" style="width:100%; margin-top:5px;">
+                <option>Cardiologist</option>
+                <option>Neurologist</option>
+                <option>Pediatrician</option>
+                <option>Orthopedic</option>
+                <option>Dermatologist</option>
+                <option>Dentist</option>
+                <option>General</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:12px; color:var(--gray-500);">Experience (Years)</label>
+              <input type="number" id="prof-exp" class="search-input" style="width:100%; margin-top:5px;">
+            </div>
+          </div>
+          <div style="margin-bottom:20px;">
+            <label style="font-size:12px; color:var(--gray-500);">Clinic Address</label>
+            <input type="text" id="prof-location" class="search-input" style="width:100%; margin-top:5px;" placeholder="123 Health St, City...">
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px;">
+            <div>
+              <label style="font-size:12px; color:var(--gray-500);">Consultation Fee ($)</label>
+              <input type="number" id="prof-fee" class="search-input" style="width:100%; margin-top:5px;">
+            </div>
+          </div>
+          <button type="submit" class="add-btn" style="width:100%; padding:12px;">Save Profile Changes</button>
+          <div id="prof-msg" style="margin-top:15px; font-size:13px; text-align:center;"></div>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="js/config.js"></script>
+<script>
+function switchTab(tab) {
+  document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+  document.getElementById('tab-' + tab).style.display = 'block';
+  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  document.getElementById('topbar-title').innerText = tab.charAt(0).toUpperCase() + tab.slice(1);
+}
+
+document.getElementById('current-date').innerText = new Date().toLocaleDateString('en-US', {weekday: 'short', month: 'short', day: 'numeric', year: 'numeric'});
+
+async function loadDoctorData() {
+  const token = localStorage.getItem('medicare_token');
+  if(!token) return window.location.href='index.html';
+  
+  try {
+    const res = await fetch(`${window.MEDICARE_API_URL}/api/doctors/me`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    if(res.ok) {
+      const data = await res.json();
+      document.getElementById('dr-name').innerText = `Dr. ${data.last_name}`;
+      document.getElementById('dr-specialty').innerText = data.specialty || 'Doctor';
+      
+      document.getElementById('prof-fname').value = data.first_name || '';
+      document.getElementById('prof-lname').value = data.last_name || '';
+      document.getElementById('prof-specialty').value = data.specialty || 'General';
+      document.getElementById('prof-exp').value = data.experience_years || '';
+      document.getElementById('prof-location').value = data.location || '';
+      document.getElementById('prof-fee').value = data.fee_per_visit || '';
+    }
+  } catch(e) { console.error(e); }
+}
+
+async function saveDoctorProfile(e) {
+  e.preventDefault();
+  const token = localStorage.getItem('medicare_token');
+  const payload = {
+    first_name: document.getElementById('prof-fname').value,
+    last_name: document.getElementById('prof-lname').value,
+    specialty: document.getElementById('prof-specialty').value,
+    experience_years: parseInt(document.getElementById('prof-exp').value) || 0,
+    location: document.getElementById('prof-location').value,
+    fee_per_visit: parseFloat(document.getElementById('prof-fee').value) || 0
+  };
+  
+  const msg = document.getElementById('prof-msg');
+  msg.innerText = 'Saving...';
+  msg.style.color = 'var(--gray-500)';
+  
+  try {
+    const res = await fetch(`${window.MEDICARE_API_URL}/api/doctors/me`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
+    if(res.ok) {
+      msg.innerText = 'Profile updated successfully!';
+      msg.style.color = 'var(--teal)';
+      loadDoctorData();
+    } else {
+      msg.innerText = 'Failed to update profile.';
+      msg.style.color = 'var(--red)';
+    }
+  } catch(err) {
+    msg.innerText = err.message;
+    msg.style.color = 'var(--red)';
+  }
+}
+
+function logout() {
+  localStorage.removeItem('medicare_token');
+  localStorage.removeItem('medicare_role');
+  window.location.href = 'index.html';
+}
+
+document.addEventListener('DOMContentLoaded', loadDoctorData);
+</script>
+</body>
+</html>

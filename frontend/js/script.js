@@ -70,6 +70,7 @@ async function handleLogin(e) {
     
     // Success
     localStorage.setItem('medicare_token', data.access_token);
+    localStorage.setItem('medicare_role', data.role || 'patient');
     btn.innerHTML = 'Success <i class="fas fa-check"></i>';
     btn.style.background = 'var(--green)';
     
@@ -111,7 +112,7 @@ async function handleRegister(e) {
         last_name: lastName,
         email: email,
         password: password,
-        role: "patient"
+        role: document.querySelector('input[name="register-role"]:checked') ? document.querySelector('input[name="register-role"]:checked').value : 'patient'
       })
     });
     
@@ -141,12 +142,15 @@ async function handleRegister(e) {
 // Update UI based on auth state
 document.addEventListener("DOMContentLoaded", () => {
   const token = localStorage.getItem('medicare_token');
+  const role = localStorage.getItem('medicare_role') || 'patient';
+  
   if (token) {
+    const dashboardLink = role === 'doctor' ? 'doctor-dashboard.html' : role === 'admin' ? 'admin.html' : 'patient-dashboard.html';
     const ctaDivs = document.querySelectorAll('.nav-cta');
     ctaDivs.forEach(cta => {
       cta.innerHTML = `
         <button class="btn-outline" onclick="logout()">Logout</button>
-        <button class="btn-primary" onclick="location.href='patient-dashboard.html'">Dashboard</button>
+        <button class="btn-primary" onclick="location.href='${dashboardLink}'">Dashboard</button>
       `;
     });
   }
@@ -163,5 +167,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function logout() {
   localStorage.removeItem('medicare_token');
+  localStorage.removeItem('medicare_role');
   window.location.href = 'index.html';
 }

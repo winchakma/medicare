@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.env
+.python-version
+clean_admin_js.py
+backend/test_recent_activity.py

@@ -22,6 +22,7 @@
     <div class="nav-item" onclick="switchTab('appointments')"><span class="icon">📅</span> Appointments <span class="badge" id="dr-appt-count">0</span></div>
     <div class="nav-item" onclick="switchTab('patients')"><span class="icon">🧑‍🤝‍🧑</span> My Patients</div>
     <div class="nav-item" onclick="switchTab('schedule')"><span class="icon">🕒</span> Schedule</div>
+    <div class="nav-item" onclick="switchTab('blog')"><span class="icon">📝</span> Health Blog</div>
     
     <div class="nav-section-label">Finance</div>
     <div class="nav-item" onclick="switchTab('earnings')"><span class="icon">💰</span> Earnings</div>
@@ -284,6 +285,33 @@
         </form>
       </div>
     </div>
+    <div id="tab-blog" class="tab-content" style="display:none;">
+      <div class="table-card" style="padding:24px; max-width:800px;">
+        <h3 style="margin-bottom:20px; color:var(--navy);">Post to Health Blog</h3>
+        <form id="dr-blog-form" onsubmit="submitBlog(event)">
+          <div style="margin-bottom:20px;">
+            <label style="font-size:12px; font-weight:600; color:var(--navy);">Title</label>
+            <input type="text" id="blog-title" class="search-input" style="width:100%; margin-top:5px;" required>
+          </div>
+          <div style="margin-bottom:20px;">
+            <label style="font-size:12px; font-weight:600; color:var(--navy);">Category</label>
+            <select id="blog-category" class="search-input" style="width:100%; margin-top:5px;">
+              <option value="CARDIOLOGY">Cardiology</option>
+              <option value="NUTRITION">Nutrition</option>
+              <option value="MENTAL HEALTH">Mental Health</option>
+              <option value="FITNESS">Fitness</option>
+              <option value="GENERAL">General</option>
+            </select>
+          </div>
+          <div style="margin-bottom:20px;">
+            <label style="font-size:12px; font-weight:600; color:var(--navy);">Content</label>
+            <textarea id="blog-content" class="search-input" style="width:100%; margin-top:5px; height:150px; resize:vertical;" required placeholder="Write your health tip or article here..."></textarea>
+          </div>
+          <button type="submit" class="submit-btn" style="width:100%; padding:14px;">Publish Blog Post</button>
+          <div id="blog-msg" style="margin-top:15px; font-size:13px; text-align:center;"></div>
+        </form>
+      </div>
+    </div>
     <div id="tab-earnings" class="tab-content" style="display:none;"><div class="table-card" style="padding:40px; text-align:center; color:var(--gray-500);">Detailed earnings report coming soon.</div></div>
     <div id="tab-support" class="tab-content" style="display:none;"><div class="table-card" style="padding:40px; text-align:center; color:var(--gray-500);">Support center coming soon.</div></div>
 
@@ -315,6 +343,7 @@ function switchTab(tab) {
       'appointments': 'Appointments',
       'patients': 'My Patients',
       'schedule': 'Schedule',
+      'blog': 'Health Blog',
       'earnings': 'Earnings',
       'profile': 'Profile Settings',
       'support': 'Support'
@@ -618,6 +647,42 @@ async function saveSchedule(e) {
       msg.style.color = 'var(--red)';
     }
   } catch(err) {
+    msg.innerText = err.message;
+    msg.style.color = 'var(--red)';
+  }
+}
+
+async function submitBlog(e) {
+  e.preventDefault();
+  const token = localStorage.getItem('medicare_token');
+  const msg = document.getElementById('blog-msg');
+  msg.innerText = 'Publishing...';
+  msg.style.color = 'var(--gray-500)';
+
+  const payload = {
+    title: document.getElementById('blog-title').value,
+    category: document.getElementById('blog-category').value,
+    content: document.getElementById('blog-content').value
+  };
+
+  try {
+    const res = await fetch(`${window.MEDICARE_API_URL}/api/blogs/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(payload)
+    });
+    if (res.ok) {
+      msg.innerText = 'Blog published successfully!';
+      msg.style.color = 'var(--teal)';
+      document.getElementById('dr-blog-form').reset();
+    } else {
+      msg.innerText = 'Failed to publish blog.';
+      msg.style.color = 'var(--red)';
+    }
+  } catch (err) {
     msg.innerText = err.message;
     msg.style.color = 'var(--red)';
   }

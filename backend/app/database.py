@@ -26,11 +26,12 @@ async def init_db():
         from app.models.user import User
         from app.models.booking import Booking
         from app.models.admin import AdminConfig
+        from app.models.blog import Blog
         
         await init_beanie(
             database=client[db_name],
             document_models=[
-                User, Booking, AdminConfig
+                User, Booking, AdminConfig, Blog
             ]
         )
 

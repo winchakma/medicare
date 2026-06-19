@@ -3,7 +3,7 @@ from fastapi.staticfiles import StaticFiles
 import os
 from fastapi.middleware.cors import CORSMiddleware
 from app.database import init_db
-from app.routes import auth, doctors, admin
+from app.routes import auth, doctors, admin, blog
 
 app = FastAPI(title="MediCare API")
 
@@ -26,6 +26,7 @@ async def start_database():
 app.include_router(auth.router, prefix="/api/auth", tags=["Auth"])
 app.include_router(doctors.router, prefix="/api/doctors", tags=["Doctors"])
 app.include_router(admin.router, prefix="/api/admin", tags=["Admin"])
+app.include_router(blog.router, prefix="/api/blogs", tags=["Blogs"])
 
 @app.get("/")
 def read_root():

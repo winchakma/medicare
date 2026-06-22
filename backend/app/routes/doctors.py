@@ -46,7 +46,7 @@ class DoctorListOut(BaseModel):
 
 @router.get("/list", response_model=List[DoctorListOut])
 async def get_doctors():
-    doctors = await User.find(User.role == "doctor").project(DoctorListOut).to_list()
+    doctors = await User.find(User.role == "doctor", User.is_verified == True).project(DoctorListOut).to_list()
     return doctors
 
 @router.get("/me")

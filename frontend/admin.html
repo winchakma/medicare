@@ -43,7 +43,18 @@
     <div class="topbar-title">Dashboard Overview</div>
     <div class="topbar-actions">
       <div class="date-display">Thu, Jun 11, 2026</div>
-      <div class="notif-btn">🔔<div class="notif-dot"></div></div>
+      <div style="position: relative; display: inline-block;">
+        <div class="notif-btn" id="notif-bell-btn" style="cursor: pointer; position: relative;">🔔<div class="notif-dot" id="notif-bell-dot" style="position: absolute; top: 0; right: 0; width: 8px; height: 8px; background: red; border-radius: 50%;"></div></div>
+        <div id="notif-bell-dropdown" style="display: none; position: absolute; right: 0; top: 100%; width: 280px; background: white; border: 1px solid #E5E7EB; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 10000; margin-top: 10px; padding: 10px 0;">
+          <div style="font-size: 14px; font-weight: 600; padding: 8px 16px; border-bottom: 1px solid #F3F4F6; color: var(--navy); display:flex; justify-content:space-between; align-items:center;">
+            <span>Notifications</span>
+            <span style="font-size:11px; color:var(--teal); cursor:pointer;" onclick="event.stopPropagation(); document.getElementById('notif-bell-dot').style.display='none';">Mark read</span>
+          </div>
+          <div id="notif-list-container" style="max-height: 200px; overflow-y: auto; font-size: 13px; color: var(--navy); padding: 5px 0;">
+            <div style="padding: 16px; text-align: center; color: #9CA3AF;">No new notifications</div>
+          </div>
+        </div>
+      </div>
       <button class="add-btn">+ Add Doctor</button>
     </div>
   </div>

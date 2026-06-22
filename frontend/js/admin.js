@@ -447,6 +447,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 7. Recent Activity
     if (actRes && actRes.ok) {
       const acts = await actRes.json();
+      
+      // Populate admin activity timeline
       const actDiv = document.getElementById('admin-recent-activity');
       if (actDiv) {
         actDiv.innerHTML = '';
@@ -463,9 +465,44 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
         if (acts.length === 0) actDiv.innerHTML = '<div style="padding:10px;text-align:center;color:#666;">No recent activity.</div>';
       }
+
+      // Populate notification dropdown list
+      const notifContainer = document.getElementById('notif-list-container');
+      if (notifContainer) {
+        notifContainer.innerHTML = '';
+        acts.forEach(a => {
+          notifContainer.innerHTML += `
+            <div style="padding: 10px 16px; border-bottom: 1px solid #F9FAFB; display: flex; gap: 10px; align-items: flex-start; text-align: left;">
+              <div style="width: 8px; height: 8px; border-radius: 50%; background: ${a.color}; margin-top: 5px; flex-shrink: 0;"></div>
+              <div>
+                <div style="font-weight: 500; line-height: 1.4; color: var(--navy);">${a.text}</div>
+                <div style="font-size: 11px; color: #9CA3AF; margin-top: 2px;">${a.time_str}</div>
+              </div>
+            </div>
+          `;
+        });
+        if (acts.length === 0) {
+          notifContainer.innerHTML = '<div style="padding: 16px; text-align: center; color: #9CA3AF;">No new notifications</div>';
+        }
+      }
     } else {
       const actDiv = document.getElementById('admin-recent-activity');
       if (actDiv) actDiv.innerHTML = '<div style="padding:10px;text-align:center;color:#666;">Failed to load activity.</div>';
+    }
+
+    // Wire notification dropdown toggle
+    const notifBtn = document.getElementById('notif-bell-btn');
+    const notifDropdown = document.getElementById('notif-bell-dropdown');
+    if (notifBtn && notifDropdown) {
+      notifBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        notifDropdown.style.display = notifDropdown.style.display === 'block' ? 'none' : 'block';
+        const dot = document.getElementById('notif-bell-dot');
+        if (dot) dot.style.display = 'none';
+      });
+      document.addEventListener('click', () => {
+        notifDropdown.style.display = 'none';
+      });
     }
 
     // Update Sidebar Badges

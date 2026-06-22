@@ -38,12 +38,8 @@
         </div>
         <div>
             <h3 style="margin-bottom:20px;">Upcoming Appointments</h3>
-            <div style="border:1px solid var(--gray-200); border-radius:12px; padding:20px; display:flex; align-items:center; gap:20px;">
-                <img src="image/pexels-mikhail-nilov-8942498.jpg" style="width:60px; height:60px; border-radius:50%; object-fit:cover;">
-                <div>
-                    <h4>Dr. Sarah Miller</h4>
-                    <p style="color:var(--gray-500); font-size:14px;">Cardiologist • Oct 15, 10:00 AM</p>
-                </div>
+            <div id="appointments-container" style="display:flex; flex-direction:column; gap:16px;">
+                <div style="text-align:center; padding:30px; color:var(--gray-500);">Loading appointments...</div>
             </div>
         </div>
     </div>
@@ -63,6 +59,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     if(!token) return window.location.href='index.html';
     
     try {
+        // Load User Details
         const res = await fetch(`${window.MEDICARE_API_URL}/api/auth/me`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
@@ -70,7 +67,56 @@ document.addEventListener('DOMContentLoaded', async () => {
             const data = await res.json();
             document.getElementById('patient-name').innerText = `${data.first_name} ${data.last_name}`;
         }
-    } catch(e) { console.error(e); }
+
+        // Load Bookings
+        const bookRes = await fetch(`${window.MEDICARE_API_URL}/api/bookings/my-appointments`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        const container = document.getElementById('appointments-container');
+        if(bookRes.ok) {
+            const bookings = await bookRes.json();
+            container.innerHTML = '';
+            if(bookings.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:30px; border:1px dashed var(--gray-300); border-radius:12px; color:var(--gray-500);">You have no upcoming appointments.</div>';
+                return;
+            }
+
+            bookings.forEach(b => {
+                let init = "DR";
+                if (b.doctor_name) {
+                    const parts = b.doctor_name.replace('Dr. ', '').split(' ');
+                    if(parts.length >= 2) init = parts[0][0] + parts[parts.length-1][0];
+                    else init = parts[0].substring(0, 2);
+                }
+                
+                let avatarHtml = `<div style="width:60px; height:60px; border-radius:50%; background:var(--teal); display:flex; align-items:center; justify-content:center; color:white; font-size:20px; font-weight:600;">${init.toUpperCase()}</div>`;
+                if(b.avatar_url) {
+                    avatarHtml = `<img src="${b.avatar_url}" style="width:60px; height:60px; border-radius:50%; object-fit:cover;">`;
+                }
+
+                container.innerHTML += `
+                <div style="border:1px solid var(--gray-200); border-radius:12px; padding:20px; display:flex; align-items:center; justify-content:between; gap:20px; background:white; box-shadow: 0 2px 8px rgba(0,0,0,0.02);">
+                    <div style="display:flex; align-items:center; gap:20px; flex:1;">
+                        ${avatarHtml}
+                        <div>
+                            <h4 style="margin:0; color:var(--navy); font-size:16px;">${b.doctor_name}</h4>
+                            <p style="color:var(--gray-500); font-size:14px; margin:4px 0 0;">${b.specialty} &bull; ${b.date} &bull; ${b.time_slot}</p>
+                            <p style="font-size:12px; color:var(--gray-400); margin:4px 0 0;">Type: ${b.consultation_type === 'video' ? '📹 Video' : '🏥 In-person'} | Location: ${b.location}</p>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="status-badge status-${b.status}" style="text-transform:capitalize; padding:6px 12px; border-radius:20px; font-size:12px; font-weight:600;">${b.status}</span>
+                    </div>
+                </div>
+                `;
+            });
+        } else {
+            container.innerHTML = '<div style="text-align:center; padding:30px; color:red;">Failed to load appointments.</div>';
+        }
+    } catch(e) { 
+        console.error(e); 
+        document.getElementById('appointments-container').innerHTML = '<div style="text-align:center; padding:30px; color:red;">Connection error.</div>';
+    }
 });
 </script>
 

@@ -271,9 +271,49 @@
       </div>
     </div>
     
-    <!-- OTHER TABS PLACEHOLDERS -->
-    <div id="tab-appointments" class="tab-content" style="display:none;"><div class="table-card" style="padding:40px; text-align:center; color:var(--gray-500);">Appointments view coming soon.</div></div>
-    <div id="tab-patients" class="tab-content" style="display:none;"><div class="table-card" style="padding:40px; text-align:center; color:var(--gray-500);">Patients list coming soon.</div></div>
+    <!-- APPOINTMENTS TAB -->
+    <div id="tab-appointments" class="tab-content" style="display:none;">
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">My Appointments</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>Date & Time</th>
+              <th>Type</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="all-appointments-list">
+            <tr><td colspan="5" style="text-align:center; color:var(--gray-500); padding:20px;">Loading appointments...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PATIENTS TAB -->
+    <div id="tab-patients" class="tab-content" style="display:none;">
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">My Patients</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Phone</th>
+            </tr>
+          </thead>
+          <tbody id="all-patients-list">
+            <tr><td colspan="3" style="text-align:center; color:var(--gray-500); padding:20px;">Loading patients...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
     <div id="tab-schedule" class="tab-content" style="display:none;">
       <div class="table-card" style="padding:24px; max-width:800px;">
         <h3 style="margin-bottom:20px; color:var(--navy);">Weekly Schedule</h3>
@@ -312,8 +352,54 @@
         </form>
       </div>
     </div>
-    <div id="tab-earnings" class="tab-content" style="display:none;"><div class="table-card" style="padding:40px; text-align:center; color:var(--gray-500);">Detailed earnings report coming soon.</div></div>
-    <div id="tab-support" class="tab-content" style="display:none;"><div class="table-card" style="padding:40px; text-align:center; color:var(--gray-500);">Support center coming soon.</div></div>
+    <!-- EARNINGS TAB -->
+    <div id="tab-earnings" class="tab-content" style="display:none;">
+      <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr); margin-bottom: 24px;">
+        <div class="stat-card">
+          <div class="stat-card-label" style="font-size:12px; color:var(--gray-500);">Gross Consultation Fees</div>
+          <div class="stat-card-value" id="earnings-gross" style="font-size:24px; font-weight:600; color:var(--navy);">$0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label" style="font-size:12px; color:var(--gray-500);">Platform Commission (10%)</div>
+          <div class="stat-card-value" id="earnings-platform" style="font-size:24px; font-weight:600; color:var(--red);">$0</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label" style="font-size:12px; color:var(--gray-500);">Net Earnings</div>
+          <div class="stat-card-value" id="earnings-net" style="font-size:24px; font-weight:600; color:var(--teal);">$0</div>
+        </div>
+      </div>
+      <div class="table-card">
+        <div class="table-header">
+          <div class="table-title">Earning Transactions</div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Patient</th>
+              <th>Date & Time</th>
+              <th>Status</th>
+              <th>Transaction Amount</th>
+            </tr>
+          </thead>
+          <tbody id="earnings-log-list">
+            <tr><td colspan="4" style="text-align:center; color:var(--gray-500); padding:20px;">Loading transaction details...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SUPPORT TAB -->
+    <div id="tab-support" class="tab-content" style="display:none;">
+      <div class="table-card" style="padding:24px; max-width:800px;">
+        <h3 style="margin-bottom:15px; color:var(--navy);">Support Center</h3>
+        <p style="font-size:14px; color:var(--gray-500); margin-bottom:20px;">Contact Medicare admin support for any issues or payout requests.</p>
+        <div style="background:var(--gray-50); padding:20px; border-radius:8px; margin-bottom:20px;">
+          <h4 style="margin:0 0 10px; color:var(--navy);">Hotline Assistance</h4>
+          <p style="margin:4px 0; font-size:14px;"><strong>Email:</strong> support@medicare.com</p>
+          <p style="margin:4px 0; font-size:14px;"><strong>Phone:</strong> +1 (555) 987-6543</p>
+        </div>
+      </div>
+    </div>
 
   </div>
 </div>
@@ -475,13 +561,12 @@ async function loadDashboardStats(token) {
             if(stats.upcoming_appointments.length > 0) {
                 upcomingList.innerHTML = '';
                 stats.upcoming_appointments.forEach(b => {
-                    const statusBadge = `<span class="status-badge status-confirmed">Confirmed</span>`;
                     upcomingList.innerHTML += `
                     <tr>
                       <td style="font-weight:500;">${b.patient_name}</td>
                       <td>${b.date} · ${b.time_slot}</td>
                       <td>${b.consultation_type === 'video' ? '📹 Video' : '🏥 In-person'}</td>
-                      <td><div class="action-btns"><button class="act-btn">View</button></div></td>
+                      <td><div class="action-btns"><button class="act-btn" onclick="switchTab('appointments')">Manage</button></div></td>
                     </tr>`;
                 });
             } else {
@@ -497,14 +582,139 @@ async function loadDashboardStats(token) {
                     <div class="doctor-row-item">
                       <div class="mini-avatar" style="background:var(--teal);width:36px;height:36px;font-size:13px">${p.avatar}</div>
                       <div class="dr-info"><div class="dr-name" style="font-size:14px">${p.name}</div><div class="dr-spec" style="font-size:12px">Patient</div></div>
-                      <div><button class="act-btn" style="background:var(--gray-50)">Profile</button></div>
+                      <div><button class="act-btn" style="background:var(--gray-50)" onclick="switchTab('patients')">Patients</button></div>
                     </div>`;
                 });
             } else {
                 recentList.innerHTML = '<div style="text-align:center; color:var(--gray-500); font-size:13px; padding:20px;">No recent patients</div>';
             }
         }
+
+        // Load Detailed Doctor Appointments
+        const apptsRes = await fetch(`${window.MEDICARE_API_URL}/api/bookings/doctor-appointments`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if(apptsRes.ok) {
+            const bookings = await apptsRes.json();
+            
+            // 1. Render all appointments list
+            const allApptsList = document.getElementById('all-appointments-list');
+            allApptsList.innerHTML = '';
+            if (bookings.length === 0) {
+                allApptsList.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--gray-500); padding:20px;">No appointments found.</td></tr>';
+            } else {
+                bookings.forEach(b => {
+                    let actionHtml = '';
+                    if (b.status === 'pending') {
+                        actionHtml = `
+                          <button class="act-btn" style="background:var(--teal); color:white; border:none; margin-right:4px;" onclick="updateBookingStatus('${b.id}', 'confirmed')">Confirm</button>
+                          <button class="act-btn" style="background:var(--red); color:white; border:none;" onclick="updateBookingStatus('${b.id}', 'cancelled')">Cancel</button>
+                        `;
+                    } else if (b.status === 'confirmed') {
+                        actionHtml = `
+                          <button class="act-btn" style="background:var(--teal); color:white; border:none;" onclick="updateBookingStatus('${b.id}', 'completed')">Complete</button>
+                          <button class="act-btn" style="background:var(--red); color:white; border:none; margin-left:4px;" onclick="updateBookingStatus('${b.id}', 'cancelled')">Cancel</button>
+                        `;
+                    } else {
+                        actionHtml = `<span style="font-size:12px; color:var(--gray-400); text-transform:capitalize;">${b.status}</span>`;
+                    }
+
+                    allApptsList.innerHTML += `
+                    <tr>
+                      <td style="font-weight:500;">${b.patient_name}</td>
+                      <td>${b.date} &bull; ${b.time_slot}</td>
+                      <td>${b.consultation_type === 'video' ? '📹 Video' : '🏥 In-person'}</td>
+                      <td><span class="status-badge status-${b.status}" style="text-transform:capitalize;">${b.status}</span></td>
+                      <td><div class="action-btns">${actionHtml}</div></td>
+                    </tr>`;
+                });
+            }
+
+            // 2. Render unique patients list
+            const allPatientsList = document.getElementById('all-patients-list');
+            allPatientsList.innerHTML = '';
+            const uniquePatients = {};
+            bookings.forEach(b => {
+                if (b.patient_name && !uniquePatients[b.patient_name]) {
+                    uniquePatients[b.patient_name] = {
+                        name: b.patient_name,
+                        email: b.email || 'N/A',
+                        phone: b.phone || 'N/A'
+                    };
+                }
+            });
+
+            const patientArray = Object.values(uniquePatients);
+            if (patientArray.length === 0) {
+                allPatientsList.innerHTML = '<tr><td colspan="3" style="text-align:center; color:var(--gray-500); padding:20px;">No patients found.</td></tr>';
+            } else {
+                patientArray.forEach(p => {
+                    allPatientsList.innerHTML += `
+                    <tr>
+                      <td style="font-weight:500;">${p.name}</td>
+                      <td>${p.email}</td>
+                      <td>${p.phone}</td>
+                    </tr>`;
+                });
+            }
+
+            // 3. Render Earnings tab details
+            let grossEarnings = 0;
+            const completedBookings = bookings.filter(b => b.status === 'completed' || b.payment_status === 'paid');
+            const earningsLog = document.getElementById('earnings-log-list');
+            earningsLog.innerHTML = '';
+
+            completedBookings.forEach(b => {
+                const amt = b.fee_amount || 0;
+                grossEarnings += amt;
+                
+                earningsLog.innerHTML += `
+                <tr>
+                  <td>${b.patient_name}</td>
+                  <td>${b.date} &bull; ${b.time_slot}</td>
+                  <td><span class="status-badge status-${b.status}">${b.status}</span></td>
+                  <td style="font-weight:600; color:var(--teal);">$${amt}</td>
+                </tr>`;
+            });
+
+            const platformFee = grossEarnings * 0.10;
+            const netEarnings = grossEarnings - platformFee;
+
+            document.getElementById('earnings-gross').innerText = `$${grossEarnings.toLocaleString()}`;
+            document.getElementById('earnings-platform').innerText = `$${platformFee.toLocaleString()}`;
+            document.getElementById('earnings-net').innerText = `$${netEarnings.toLocaleString()}`;
+
+            if (completedBookings.length === 0) {
+                earningsLog.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--gray-500); padding:20px;">No transaction history.</td></tr>';
+            }
+        }
     } catch(e) { console.error(e); }
+}
+
+async function updateBookingStatus(bookingId, newStatus) {
+    const token = localStorage.getItem('medicare_token');
+    if (!confirm(`Are you sure you want to change status to ${newStatus}?`)) return;
+
+    try {
+        const res = await fetch(`${window.MEDICARE_API_URL}/api/bookings/${bookingId}/status`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({ status: newStatus })
+        });
+        if (res.ok) {
+            alert(`Booking successfully ${newStatus}!`);
+            loadDoctorData(); // Reload UI
+        } else {
+            const err = await res.json();
+            alert(`Failed: ${err.detail || 'Unknown error'}`);
+        }
+    } catch(e) {
+        console.error(e);
+        alert("Connection error.");
+    }
 }
 
 async function saveDoctorProfile(e) {

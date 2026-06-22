@@ -76,21 +76,26 @@
       <div class="form-section">
         <div class="form-section-title">Patient Information</div>
         <div class="field-row">
-          <div class="field-group"><label>First Name <span class="required">*</span></label><input type="text" placeholder="Enter first name"></div>
-          <div class="field-group"><label>Last Name <span class="required">*</span></label><input type="text" placeholder="Enter last name"></div>
+          <div class="field-group"><label>First Name <span class="required">*</span></label><input type="text" id="booking-fname" placeholder="Enter first name" required></div>
+          <div class="field-group"><label>Last Name <span class="required">*</span></label><input type="text" id="booking-lname" placeholder="Enter last name" required></div>
         </div>
         <div class="field-row">
-          <div class="field-group"><label>Date of Birth <span class="required">*</span></label><input type="date"></div>
+          <div class="field-group"><label>Date of Birth <span class="required">*</span></label><input type="date" id="booking-dob" required></div>
           <div class="field-group"><label>Gender <span class="required">*</span></label>
-            <select><option>Select gender</option><option>Male</option><option>Female</option><option>Other</option></select>
+            <select id="booking-gender" required><option value="">Select gender</option><option>Male</option><option>Female</option><option>Other</option></select>
           </div>
         </div>
         <div class="field-row">
-          <div class="field-group"><label>Phone Number <span class="required">*</span></label><input type="tel" placeholder="01XXXXXXXXX"></div>
-          <div class="field-group"><label>Email Address</label><input type="email" placeholder="example@email.com"></div>
+          <div class="field-group"><label>Phone Number <span class="required">*</span></label><input type="tel" id="booking-phone" placeholder="01XXXXXXXXX" required></div>
+          <div class="field-group"><label>Consultation Type <span class="required">*</span></label>
+            <select id="booking-consult-type" required><option value="in_person">In-Person Visit</option><option value="video">Video Consultation</option></select>
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field-group" style="flex:1;"><label>Email Address</label><input type="email" id="booking-email" placeholder="example@email.com"></div>
         </div>
         <div class="field-single">
-          <div class="field-group"><label>Reason for Visit <span class="required">*</span></label><textarea placeholder="Briefly describe your symptoms or reason for the appointment..."></textarea></div>
+          <div class="field-group"><label>Reason for Visit <span class="required">*</span></label><textarea id="booking-reason" placeholder="Briefly describe your symptoms or reason for the appointment..." required></textarea></div>
         </div>
       </div>
 
@@ -121,7 +126,7 @@
         </div>
       </div>
 
-      <button class="submit-btn">Confirm & Pay $80 →</button>
+      <button class="submit-btn" id="btn-confirm-booking" onclick="submitBookingAppointment()">Confirm & Book →</button>
       <div class="secure-note">🔒 Secured by Stripe · 256-bit SSL encryption</div>
     </div>
   </div>
@@ -130,21 +135,21 @@
   <div class="summary-card">
     <div class="summary-title">Booking Summary</div>
     <div class="doc-mini">
-      <div class="doc-mini-avatar">SA</div>
+      <div class="doc-mini-avatar" id="summary-avatar">DR</div>
       <div>
-        <div class="doc-mini-name">Dr. Sarah Miller</div>
-        <div class="doc-mini-spec">Cardiologist</div>
+        <div class="doc-mini-name" id="summary-doc-name">Loading Doctor...</div>
+        <div class="doc-mini-spec" id="summary-doc-spec">Specialty</div>
       </div>
     </div>
-    <div class="booking-detail"><span class="booking-detail-label">Date</span><span class="booking-detail-value">Mon, Jun 11, 2026</span></div>
-    <div class="booking-detail"><span class="booking-detail-label">Time</span><span class="booking-detail-value">10:00 AM</span></div>
-    <div class="booking-detail"><span class="booking-detail-label">Type</span><span class="booking-detail-value">In-Person Visit</span></div>
-    <div class="booking-detail"><span class="booking-detail-label">Location</span><span class="booking-detail-value">New York Medical College</span></div>
+    <div class="booking-detail"><span class="booking-detail-label">Date</span><span class="booking-detail-value" id="summary-date">Select Date</span></div>
+    <div class="booking-detail"><span class="booking-detail-label">Time</span><span class="booking-detail-value" id="summary-time">Select Slot</span></div>
+    <div class="booking-detail"><span class="booking-detail-label">Type</span><span class="booking-detail-value" id="summary-type">In-Person Visit</span></div>
+    <div class="booking-detail"><span class="booking-detail-label">Location</span><span class="booking-detail-value" id="summary-location">Online</span></div>
     <div class="price-breakdown">
-      <div class="price-row"><span style="color:var(--gray-500)">Consultation fee</span><span>$80</span></div>
-      <div class="price-row"><span style="color:var(--gray-500)">Platform fee</span><span>$50</span></div>
+      <div class="price-row"><span style="color:var(--gray-500)">Consultation fee</span><span id="summary-consult-fee">$0</span></div>
+      <div class="price-row"><span style="color:var(--gray-500)">Platform fee</span><span id="summary-platform-fee">$10</span></div>
       <div class="price-row"><span style="color:var(--gray-500)">Discount</span><span style="color:#16a34a">−$0</span></div>
-      <div class="price-row total"><span>Total</span><span>$850</span></div>
+      <div class="price-row total"><span>Total</span><span id="summary-total-fee">$10</span></div>
     </div>
     <div class="promo-input">
       <input type="text" placeholder="Promo code">
@@ -193,24 +198,249 @@
   </div>
 </footer>
 <script>
-  document.querySelectorAll('.slot:not(.booked)').forEach(s => {
-    s.addEventListener('click', () => {
-      document.querySelectorAll('.slot').forEach(x => x.classList.remove('selected'));
-      s.classList.add('selected');
+  let selectedDateStr = "";
+  let selectedTimeSlotStr = "";
+  let doctorFee = 0;
+  let doctorObj = null;
+
+  document.addEventListener('DOMContentLoaded', async () => {
+    const token = localStorage.getItem('medicare_token');
+    if (!token) {
+      alert("Please login first to book an appointment.");
+      window.location.href = "index.html";
+      return;
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const doctorId = urlParams.get('id');
+    if (!doctorId) {
+      alert("No doctor selected.");
+      window.location.href = "doctors.html";
+      return;
+    }
+
+    // Prepopulate patient details if available from me API
+    try {
+      const meRes = await fetch(`${window.MEDICARE_API_URL}/api/auth/me`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (meRes.ok) {
+        const me = await meRes.json();
+        document.getElementById('booking-fname').value = me.first_name || '';
+        document.getElementById('booking-lname').value = me.last_name || '';
+        document.getElementById('booking-phone').value = me.phone || '';
+        document.getElementById('booking-email').value = me.email || '';
+      }
+    } catch(e) {}
+
+    // Fetch doctor info
+    try {
+      const docRes = await fetch(`${window.MEDICARE_API_URL}/api/doctors/${doctorId}`);
+      if (!docRes.ok) {
+        alert("Failed to load doctor profile.");
+        window.location.href = "doctors.html";
+        return;
+      }
+
+      doctorObj = await docRes.json();
+      doctorFee = doctorObj.fee_per_visit || 0;
+
+      // Update Form Title
+      document.querySelector('.form-subtitle').innerText = `Fill in your details to confirm the appointment with Dr. ${doctorObj.first_name} ${doctorObj.last_name}`;
+
+      // Update Summary Card
+      document.getElementById('summary-doc-name').innerText = `Dr. ${doctorObj.first_name} ${doctorObj.last_name}`;
+      document.getElementById('summary-doc-spec').innerText = doctorObj.specialty || 'General';
+      document.getElementById('summary-location').innerText = doctorObj.location || 'Online';
+      document.getElementById('summary-consult-fee').innerText = `$${doctorFee}`;
+      document.getElementById('summary-total-fee').innerText = `$${doctorFee + 10}`;
+      document.getElementById('btn-confirm-booking').innerText = `Confirm & Book ($${doctorFee + 10}) →`;
+
+      let initials = "DR";
+      if (doctorObj.first_name && doctorObj.last_name) {
+        initials = doctorObj.first_name[0] + doctorObj.last_name[0];
+      }
+      const avatarEl = document.getElementById('summary-avatar');
+      if (doctorObj.avatar_url) {
+        avatarEl.innerHTML = `<img src="${doctorObj.avatar_url}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
+        avatarEl.style.background = 'transparent';
+      } else {
+        avatarEl.innerText = initials;
+      }
+
+      // Generate dynamic date tabs based on doctor schedule
+      generateDateTabs(doctorObj.schedule);
+
+    } catch (e) {
+      console.error(e);
+      alert("Error connecting to server.");
+    }
+
+    // Wire Consultation Type change
+    document.getElementById('booking-consult-type').addEventListener('change', (e) => {
+      const typeText = e.target.value === 'video' ? 'Video Consultation' : 'In-Person Visit';
+      document.getElementById('summary-type').innerText = typeText;
+    });
+
+    // Wire payment methods
+    document.querySelectorAll('.pay-method').forEach(p => {
+      p.addEventListener('click', () => {
+        document.querySelectorAll('.pay-method').forEach(x => x.classList.remove('active'));
+        p.classList.add('active');
+      });
     });
   });
-  document.querySelectorAll('.date-tab').forEach(d => {
-    d.addEventListener('click', () => {
-      document.querySelectorAll('.date-tab').forEach(x => x.classList.remove('active'));
-      d.classList.add('active');
-    });
-  });
-  document.querySelectorAll('.pay-method').forEach(p => {
-    p.addEventListener('click', () => {
-      document.querySelectorAll('.pay-method').forEach(x => x.classList.remove('active'));
-      p.classList.add('active');
-    });
-  });
+
+  function generateDateTabs(schedule) {
+    const tabsContainer = document.querySelector('.date-tabs');
+    tabsContainer.innerHTML = '';
+    
+    const slotsContainer = document.querySelector('.slots-grid');
+    slotsContainer.innerHTML = '<div style="grid-column: 1 / -1; text-align:center; color:var(--gray-500);">Please select a date tab.</div>';
+
+    if (!schedule || Object.keys(schedule).length === 0) {
+      tabsContainer.innerHTML = '<div style="color:red; font-size:14px;">Doctor has not set an availability schedule.</div>';
+      return;
+    }
+
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const today = new Date();
+    let tabsAdded = 0;
+
+    for (let i = 0; i < 7; i++) {
+      const futureDate = new Date(today);
+      futureDate.setDate(today.getDate() + i);
+      const dayName = days[futureDate.getDay()];
+
+      // If doctor has slots defined for this day
+      if (schedule[dayName] && schedule[dayName].length > 0) {
+        const shortDay = dayName.substring(0, 3).toUpperCase();
+        const dateString = futureDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const fullDateISO = futureDate.toISOString().split('T')[0]; // YYYY-MM-DD
+
+        const tab = document.createElement('div');
+        tab.className = `date-tab ${tabsAdded === 0 ? 'active' : ''}`;
+        tab.innerHTML = `<span class="dname">${shortDay}</span>${dateString}`;
+        tab.dataset.date = fullDateISO;
+        tab.dataset.day = dayName;
+
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.date-tab').forEach(x => x.classList.remove('active'));
+          tab.classList.add('active');
+          selectedDateStr = tab.dataset.date;
+          document.getElementById('summary-date').innerText = futureDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+          renderSlotsForDay(schedule[dayName][0]);
+        });
+
+        tabsContainer.appendChild(tab);
+
+        if (tabsAdded === 0) {
+          selectedDateStr = fullDateISO;
+          document.getElementById('summary-date').innerText = futureDate.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+          renderSlotsForDay(schedule[dayName][0]);
+        }
+        tabsAdded++;
+      }
+    }
+
+    if (tabsAdded === 0) {
+      tabsContainer.innerHTML = '<div style="color:var(--gray-500); font-size:14px;">No available booking dates this week.</div>';
+    }
+  }
+
+  function renderSlotsForDay(daySchedule) {
+    const slotsContainer = document.querySelector('.slots-grid');
+    slotsContainer.innerHTML = '';
+
+    if (!daySchedule || !daySchedule.start || !daySchedule.end) {
+      slotsContainer.innerHTML = '<div style="grid-column:1/-1; text-align:center;">No slots available.</div>';
+      return;
+    }
+
+    // Generate hourly slots
+    const startHour = parseInt(daySchedule.start.split(':')[0]);
+    const endHour = parseInt(daySchedule.end.split(':')[0]);
+
+    for (let h = startHour; h < endHour; h++) {
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const displayHour = h % 12 === 0 ? 12 : h % 12;
+      const timeStr = `${displayHour}:00 ${ampm}`;
+
+      const slot = document.createElement('div');
+      slot.className = 'slot';
+      slot.innerText = timeStr;
+      
+      slot.addEventListener('click', () => {
+        document.querySelectorAll('.slot').forEach(x => x.classList.remove('selected'));
+        slot.classList.add('selected');
+        selectedTimeSlotStr = timeStr;
+        document.getElementById('summary-time').innerText = timeStr;
+      });
+
+      slotsContainer.appendChild(slot);
+    }
+  }
+
+  async function submitBookingAppointment() {
+    const token = localStorage.getItem('medicare_token');
+    const urlParams = new URLSearchParams(window.location.search);
+    const doctorId = urlParams.get('id');
+
+    if (!selectedDateStr || !selectedTimeSlotStr) {
+      alert("Please select a date and time slot.");
+      return;
+    }
+
+    const fname = document.getElementById('booking-fname').value;
+    const lname = document.getElementById('booking-lname').value;
+    const dob = document.getElementById('booking-dob').value;
+    const gender = document.getElementById('booking-gender').value;
+    const phone = document.getElementById('booking-phone').value;
+    const reason = document.getElementById('booking-reason').value;
+
+    if (!fname || !lname || !dob || !gender || !phone || !reason) {
+      alert("Please fill in all required patient details.");
+      return;
+    }
+
+    const payload = {
+      doctor_id: doctorId,
+      date: selectedDateStr,
+      time_slot: selectedTimeSlotStr,
+      consultation_type: document.getElementById('booking-consult-type').value,
+      fee_amount: doctorFee + 10
+    };
+
+    const confirmBtn = document.getElementById('btn-confirm-booking');
+    confirmBtn.innerText = "Processing Booking...";
+    confirmBtn.disabled = true;
+
+    try {
+      const res = await fetch(`${window.MEDICARE_API_URL}/api/bookings/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (res.ok) {
+        alert("Appointment booked successfully!");
+        window.location.href = "patient-dashboard.html";
+      } else {
+        const err = await res.json();
+        alert(`Booking failed: ${err.detail || 'Unknown error'}`);
+        confirmBtn.innerText = `Confirm & Book ($${doctorFee + 10}) →`;
+        confirmBtn.disabled = false;
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Connection error.");
+      confirmBtn.innerText = `Confirm & Book ($${doctorFee + 10}) →`;
+      confirmBtn.disabled = false;
+    }
+  }
 </script>
 <script src="js/config.js"></script>
 <script src="js/script.js?v=2"></script>

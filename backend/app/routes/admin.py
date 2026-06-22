@@ -283,3 +283,32 @@ async def upload_admin_avatar(file: UploadFile = File(...), current_user: User =
     current_user.avatar_url = f"/{file_path}"
     await current_user.save()
     return {"avatar_url": current_user.avatar_url}
+
+@router.put("/doctors/{doctor_id}/verify")
+async def toggle_doctor_verification(doctor_id: str, current_user: User = Depends(get_current_user)):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+    from beanie import PydanticObjectId
+    try:
+        doctor = await User.get(PydanticObjectId(doctor_id))
+        if not doctor or doctor.role != "doctor":
+            raise HTTPException(status_code=404, detail="Doctor not found")
+        doctor.is_verified = not doctor.is_verified
+        await doctor.save()
+        return {"message": "Verification status updated", "verified": doctor.is_verified}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.delete("/doctors/{doctor_id}")
+async def delete_doctor(doctor_id: str, current_user: User = Depends(get_current_user)):
+    if current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+    from beanie import PydanticObjectId
+    try:
+        doctor = await User.get(PydanticObjectId(doctor_id))
+        if not doctor or doctor.role != "doctor":
+            raise HTTPException(status_code=404, detail="Doctor not found")
+        await doctor.delete()
+        return {"message": "Doctor deleted successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

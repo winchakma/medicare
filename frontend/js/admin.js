@@ -582,6 +582,56 @@ window.openDoctorProfile = function(dOrId) {
     document.getElementById('dp-verified').innerText = 'Unverified';
     document.getElementById('dp-verified').className = 'status-badge status-cancelled';
   }
+
+  const verifyBtn = document.getElementById('dp-verify-btn');
+  const deleteBtn = document.getElementById('dp-delete-btn');
+  
+  if (verifyBtn) {
+    verifyBtn.innerText = d.verified ? 'Unverify Doctor' : 'Verify Doctor';
+    verifyBtn.onclick = async () => {
+      try {
+        const res = await fetch(`${window.MEDICARE_API_URL}/api/admin/doctors/${d.id}/verify`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('medicare_token')}`
+          }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          d.verified = data.verified;
+          // Refresh UI
+          window.openDoctorProfile(d);
+          // Reload doctor map list when page reloads/refreshes
+          if (window.allDoctorsMap && window.allDoctorsMap[d.id]) {
+            window.allDoctorsMap[d.id].verified = data.verified;
+          }
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
+  }
+
+  if (deleteBtn) {
+    deleteBtn.onclick = async () => {
+      if (confirm(`Are you sure you want to remove Dr. ${d.name.replace(/^Dr\.\s+/i, '')} permanently?`)) {
+        try {
+          const res = await fetch(`${window.MEDICARE_API_URL}/api/admin/doctors/${d.id}`, {
+            method: 'DELETE',
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('medicare_token')}`
+            }
+          });
+          if (res.ok) {
+            alert('Doctor deleted successfully.');
+            window.location.reload();
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+    };
+  }
   
   const av = document.getElementById('dp-avatar');
   const ini = document.getElementById('dp-initials');

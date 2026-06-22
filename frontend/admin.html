@@ -271,8 +271,12 @@
     </div>
 
     <div id="tab-doctor-profile" class="admin-tab" style="display:none;">
-      <div style="margin-bottom:20px;">
+      <div style="margin-bottom:20px; display:flex; justify-content:space-between; align-items:center;">
         <button class="filter-btn" onclick="document.querySelector('[data-tab=\'doctors\']').click()">← Back to Directory</button>
+        <div style="display:flex; gap:10px;">
+          <button id="dp-verify-btn" class="submit-btn" style="width:auto; padding: 10px 20px; margin-top:0; font-size:13px; font-weight:500;">Verify Doctor</button>
+          <button id="dp-delete-btn" class="submit-btn" style="width:auto; padding: 10px 20px; margin-top:0; font-size:13px; font-weight:500; background-color:#EF4444;">Remove Doctor</button>
+        </div>
       </div>
       <div class="table-card" style="padding:40px; display:flex; gap:40px;">
         <div style="width:200px; text-align:center;">
